@@ -6,6 +6,9 @@ import os
 from predict_image import detectImage
 import json
 from vision.srv import *
+from vision.msg import leaf_msg
+from CamTrans import CameraTrans
+from ImageTransmission import ImageTransmiter
 class VisionNode:
     def __init__(self):
     
@@ -19,27 +22,39 @@ class VisionNode:
         #self.cap.set(4,640)
         self.packagePath = rospy.get_param("/pkg_path/vision")
         self.ptPath = rospy.get_param("/pt_path")
-        self.yolov5Module = detectImage(os.path.join(self.packagePath, '/scripts/v5l-last.pt'))  #加载模型
-        rospy.Service('/vision_service',VisionDetectService, self.Callback)  #建立服务
+        self.yolov5Module = detectImage(os.path.join(self.packagePath, self.ptPath))  #加载模型
+        rospy.Service('/vision_service',leaf_detect_srv, self.leaf_detect_src_callback)  #建立服务
 
-        # rospy.wait_for_service('vision_service')
+        self.cameraInfo = CameraTrans((640, 480), (0.5, 0.4))  #相机位置信息
+        cameraX_robot      = rospy.get_param('/camera_relativeLocation/x')
+        cameraY_robot      = rospy.get_param('/camera_relativeLocation/y')
+        cameraZ_robot      = rospy.get_param('/camera_relativeLocation/z')
+        cameraYaw_robot    = rospy.get_param('/camera_relativeLocation/yaw')
+        cameraPitch_robot  = rospy.get_param('/camera_relativeLocation/pitch')
+        self.cameraInfo.SetLocation(cameraX_robot, cameraY_robot, cameraZ_robot,
+                                    cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
-        # self.vision_service = rospy.ServiceProxy('vision_service',VisionService)
 
-    def create_vision_detect_service_response(self):
-        tpm = VisionDetectServiceResponse()
-        tpm.isFind = 0
-        tpm.detect_res = 0
-        tpm.conf = 0
-        self.vision_detect_service_res = tpm
-
-    def Callback(self, data):
-        self.create_vision_detect_service_response()
-        _, self.frame = self.cap.read()
-        self.vision_detect_service_res = self.yolov5Module.detect(self.frame,self.vision_detect_service_res) #传入图片以及平面图像坐标系下的点击位置，识别
-        #data-base
+        self.computer_img_transmit = ImageTransmiter(isServer=True,ip='192.168.43.155',port=8848)
+    def leaf_detect_src_callback(self, data):
         
-        return self.vision_detect_service_res
+        # _, self.frame = self.cap.read()
+        detect_res = self.yolov5Module.detect(
+            self.frame,
+            leaf_detect_srv_res
+        )
+        leaf_detect_srv_res = leaf_detect_srvResponse()
+        for each_leaf in detect_res:
+            new_leaf_msg = leaf_msg()
+            *xywh, conf, class_index = each_leaf
+            new_leaf_msg.class_index = class_index
+            new_leaf_msg.conf = conf
+            global_x,global_y,global_z = self.cameraInfo.img2global(xywh[0],xywh[1])
+            new_leaf_msg.x = global_x
+            new_leaf_msg.y = global_y
+            new_leaf_msg.z = global_z
+            leaf_detect_srv_res.append(new_leaf_msg)
+        return leaf_detect_srv_res
         
     def MainLoop(self):
         while not rospy.is_shutdown():

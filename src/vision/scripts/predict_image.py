@@ -1,6 +1,7 @@
+#!/usr/bin/python3
+#coding:utf-8
 import sys
 import os
-# sys.path.append(rospy.get_param('/pkg_path/vision'))
 import torch
 from models.experimental import attempt_load
 import numpy as np
@@ -40,7 +41,7 @@ class detectImage:
             img = img.unsqueeze(0)
         return img
 
-    def detect(self,frame,vision_detect_service_res):
+    def detect(self,frame):
         img = self.loadPic(frame) #加载数据集
         pred = self.model(img, augment=False)[0] #检测
         pred = non_max_suppression(pred, 0.4, 0.5, classes=None, agnostic=False)[0] #NMS
@@ -48,17 +49,11 @@ class detectImage:
         if pred is not None and len(pred):
             pred[:, :4] = scale_coords(img.shape[2:], pred[:, :4], self.detect_img.shape).round()
             pred = pred.cuda().data.cpu().numpy()
-            max_indexs = np.argmax(pred, axis=0)
-            max_index = max_indexs[-2]
-            pred = pred[max_index]
-            *xyxy, conf, cls = pred
-            label = '%s %.2f' % (self.names[int(cls)], conf)
-            plot_one_box(xyxy, self.detect_img, label=label, color=self.colors[int(cls)])
-
-            vision_detect_service_res.isFind = 1
-            vision_detect_service_res.detect_res = cls
-            vision_detect_service_res.conf = conf
-        return vision_detect_service_res
+            pred[:4] = xyxy2xywh(pred[:4])
+            return pred
+            
+            #label = '%s %.2f' % (self.names[int(cls)], conf)
+            #plot_one_box(xyxy, self.detect_img, label=label, color=self.colors[int(cls)])
                 #     res_xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4))).view(-1).tolist()
                 #     res_xyxy = torch.tensor(xyxy).view(-1).tolist()
 
