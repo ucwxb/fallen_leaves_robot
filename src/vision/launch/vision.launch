@@ -3,6 +3,13 @@
 
     <param name="/pkg_path/vision" value="$(find vision)" />
     <param name="/pt_path" value="/scripts/v5l-last.pt" />
+    <param name="/cam_index" value="2" />
+    <param name="/camera_relativeLocation/x" value="0" />
+    <param name="/camera_relativeLocation/y" value="0" />
+    <param name="/camera_relativeLocation/z" value="0" />
+    <param name="/camera_relativeLocation/yaw" value="0" />
+    <param name="/camera_relativeLocation/pitch" value="0" />
+
     <node name = "vision_node" pkg = "vision" type="vision_main.py" output = "screen"/>
     <!--
     <node name = "test_vision_node" pkg = "vision" type="testVis.py" output = "screen"/>

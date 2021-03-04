@@ -50,7 +50,7 @@ class detectImage:
             pred[:, :4] = scale_coords(img.shape[2:], pred[:, :4], self.detect_img.shape).round()
             pred = pred.cuda().data.cpu().numpy()
             pred[:4] = xyxy2xywh(pred[:4])
-            return pred
+        return pred
             
             #label = '%s %.2f' % (self.names[int(cls)], conf)
             #plot_one_box(xyxy, self.detect_img, label=label, color=self.colors[int(cls)])
