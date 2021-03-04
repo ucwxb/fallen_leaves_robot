@@ -41,6 +41,13 @@ class detectImage:
             img = img.unsqueeze(0)
         return img
 
+    def draw_box(self,preds,img): #xyxy
+        for pred in preds:
+            *xyxy,conf,class_index = pred
+            label = '%s %.2f' % (self.names[int(class_index)], conf)
+            plot_one_box(xyxy, img, label=label, color=self.colors[int(class_index)])
+        return img
+
     def detect(self,frame):
         img = self.loadPic(frame) #加载数据集
         pred = self.model(img, augment=False)[0] #检测
@@ -49,11 +56,13 @@ class detectImage:
         if pred is not None and len(pred):
             pred[:, :4] = scale_coords(img.shape[2:], pred[:, :4], self.detect_img.shape).round()
             pred = pred.cuda().data.cpu().numpy()
+            frame = self.draw_box(pred,frame)
             pred[:4] = xyxy2xywh(pred[:4])
-        return pred
             
-            #label = '%s %.2f' % (self.names[int(cls)], conf)
-            #plot_one_box(xyxy, self.detect_img, label=label, color=self.colors[int(cls)])
+        return pred,frame
+            
+            #
+            #
                 #     res_xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4))).view(-1).tolist()
                 #     res_xyxy = torch.tensor(xyxy).view(-1).tolist()
 

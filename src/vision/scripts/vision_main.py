@@ -3,12 +3,14 @@
 import rospy
 import cv2
 import os
+import numpy as np
 from predict_image import detectImage
 import json
 from vision.srv import *
 from vision.msg import leaf_msg
 from CamTrans import CameraTrans
 from ImageTransmission import ImageTransmiter
+from communication_host.srv import *
 class VisionNode:
     def __init__(self):
     
@@ -16,7 +18,7 @@ class VisionNode:
         
         self.rate = rospy.Rate(20)
 
-        self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))  #临时调试用
+        # self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))  #临时调试用
         
         #self.cap.set(3,480) #调整相机画幅大小，上位机不可用
         #self.cap.set(4,640)
@@ -34,12 +36,24 @@ class VisionNode:
         self.cameraInfo.SetLocation(cameraX_robot, cameraY_robot, cameraZ_robot,
                                     cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
-
+        rospy.wait_for_service('/image_trans')
+        self.index = 0
+        self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
         # self.computer_img_transmit = ImageTransmiter(isServer=True,ip='192.168.43.155',port=8848)
-    def leaf_detect_src_callback(self, data):
+
+    def get_img(self):
+        img = self.srv_getImg().img
+        img = np.array(img,dtype="uint8")
+        img = img.reshape(len(img),1)
+        # img = [[x] for x in img]
+        img = cv2.imdecode(img,cv2.IMREAD_COLOR)
+        return img
         
-        _, self.frame = self.cap.read()
-        detect_res = self.yolov5Module.detect(self.frame)
+    def leaf_detect_src_callback(self):
+        self.index+=1
+        self.frame = self.get_img()
+        # _, self.frame = self.cap.read()
+        detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         leaf_detect_srv_res = leaf_detect_srvResponse()
         if detect_res is not None and len(detect_res):
             leaf_detect_srv_res.isFind = 1
@@ -60,7 +74,11 @@ class VisionNode:
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
-            
+            self.leaf_detect_src_callback()
+
+            path = "rev_img/"+str(self.index)+".jpg" #画box
+            path = os.path.join(self.packagePath,path)
+            cv2.imwrite(path,self.frame)
             
 if __name__ == '__main__':
     visionNode = VisionNode()
