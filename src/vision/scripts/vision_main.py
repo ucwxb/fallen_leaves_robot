@@ -9,7 +9,9 @@ import json
 from vision.srv import *
 from vision.msg import leaf_msg
 from CamTrans import CameraTrans
-from ImageTransmission import ImageTransmiter
+
+from TCP import tcp
+
 from communication_host.srv import *
 class VisionNode:
     def __init__(self):
@@ -25,7 +27,7 @@ class VisionNode:
         self.packagePath = rospy.get_param("/pkg_path/vision")
         self.ptPath = self.packagePath+rospy.get_param("/pt_path")
         self.yolov5Module = detectImage(os.path.join(self.packagePath, self.ptPath))  #加载模型
-        rospy.Service('/vision_service',leaf_detect_srv, self.leaf_detect_src_callback)  #建立服务
+        # rospy.Service('/vision_service',leaf_detect_srv, self.leaf_detect_src_callback)  #建立服务
 
         self.cameraInfo = CameraTrans((640, 480), (0.5, 0.4))  #相机位置信息
         cameraX_robot      = rospy.get_param('/camera_relativeLocation/x')
@@ -36,9 +38,12 @@ class VisionNode:
         self.cameraInfo.SetLocation(cameraX_robot, cameraY_robot, cameraZ_robot,
                                     cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
-        rospy.wait_for_service('/image_trans')
+        # rospy.wait_for_service('/image_trans')
         self.index = 0
-        self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
+        # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
+        self.my_tcp = tcp()
+        self.my_tcp.start()
+
         # self.computer_img_transmit = ImageTransmiter(isServer=True,ip='192.168.43.155',port=8848)
 
     def get_img(self):
@@ -51,7 +56,9 @@ class VisionNode:
         
     def leaf_detect_src_callback(self):
         self.index+=1
-        self.frame = self.get_img()
+        # self.frame = self.get_img()
+        self.frame = self.my_tcp.decimg.copy()
+
         # _, self.frame = self.cap.read()
         detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         leaf_detect_srv_res = leaf_detect_srvResponse()
@@ -70,15 +77,28 @@ class VisionNode:
         else:
             leaf_detect_srv_res.isFind = 0
         return leaf_detect_srv_res
+
+    def leaf_detect_src(self):
+        self.index+=1
+        # self.frame = self.get_img()
+        if self.my_tcp.decimg is None:
+            return
+        print(self.my_tcp.decimg)
+        self.frame = self.my_tcp.decimg.copy()
+        cv2.imshow("win",self.frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            return
+        # _, self.frame = self.cap.read()
+        detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
+        if detect_res is not None and len(detect_res):
+            for each_leaf in detect_res:
+                *xywh, conf, class_index = each_leaf
+                print(class_index,conf)
         
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
-            self.leaf_detect_src_callback()
-
-            path = "rev_img/"+str(self.index)+".jpg" #画box
-            path = os.path.join(self.packagePath,path)
-            cv2.imwrite(path,self.frame)
+            self.leaf_detect_src()
             
 if __name__ == '__main__':
     visionNode = VisionNode()
