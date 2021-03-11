@@ -18,7 +18,7 @@ import numpy
 class tcp:
     def __init__(self,isserver=True):
         self.isserver=isserver
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(2)
         
 
     def start(self):
