@@ -6,9 +6,9 @@ import os
 import json
 from communication_host.srv import *
 class ComHostNode:
-    def __init__(self):
+    def __init__(self): 
     
-        rospy.init_node('communication_host_node', anonymous = True)          #创建节点
+        rospy.init_node('communication_host_node', anonymous =True)          #创建节点
         
         self.rate = rospy.Rate(20)
 
@@ -21,6 +21,7 @@ class ComHostNode:
         encoded_image = cv2.imencode(".jpg", frame)[1]
         res = image_transResponse()
         res.img = encoded_image.flatten()
+	print(res.img)
         return res
         
     def MainLoop(self):
