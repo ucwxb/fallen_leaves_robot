@@ -5,6 +5,7 @@ import cv2
 import os
 import json
 from communication_host.srv import *
+from TCP import tcp
 class ComHostNode:
     def __init__(self): 
     
@@ -14,14 +15,16 @@ class ComHostNode:
 
         self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))  #临时调试用
         
-        rospy.Service('/image_trans',image_trans, self.Callback)  #建立服务
+        # rospy.Service('/image_trans',image_trans, self.Callback)  #建立服务
+        self.my_tcp = tcp(isserver=False)
+        self.my_tcp.start()
 
     def Callback(self, data):
         _,frame = self.cap.read()
         encoded_image = cv2.imencode(".jpg", frame)[1]
         res = image_transResponse()
         res.img = encoded_image.flatten()
-	print(res.img)
+        # print(res.img) 
         return res
         
     def MainLoop(self):

@@ -19,11 +19,6 @@ class VisionNode:
         rospy.init_node('vision_node', anonymous = True)          #创建节点
         
         self.rate = rospy.Rate(20)
-
-        # self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))  #临时调试用
-        
-        #self.cap.set(3,480) #调整相机画幅大小，上位机不可用
-        #self.cap.set(4,640)
         self.packagePath = rospy.get_param("/pkg_path/vision")
         self.ptPath = self.packagePath+rospy.get_param("/pt_path")
         self.yolov5Module = detectImage(os.path.join(self.packagePath, self.ptPath))  #加载模型
@@ -38,13 +33,13 @@ class VisionNode:
         self.cameraInfo.SetLocation(cameraX_robot, cameraY_robot, cameraZ_robot,
                                     cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
+         self.index = 0
+
         # rospy.wait_for_service('/image_trans')
-        self.index = 0
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
+
         self.my_tcp = tcp()
         self.my_tcp.start()
-
-        # self.computer_img_transmit = ImageTransmiter(isServer=True,ip='192.168.43.155',port=8848)
 
     def get_img(self):
         img = self.srv_getImg().img
