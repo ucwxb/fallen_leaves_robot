@@ -42,11 +42,15 @@ class VisionNode:
         self.my_tcp.start()
 
     def get_img(self):
+        start_time = time.time()  #计算ros传输帧数
         img = self.srv_getImg().img
         img = np.array(img,dtype="uint8")
         img = img.reshape(len(img),1)
         # img = [[x] for x in img]
         img = cv2.imdecode(img,cv2.IMREAD_COLOR)
+        end_time  = time.time()  #计算ros传输帧数
+        fps = 1/(end_time-start_time)
+        print(fps)
         return img
         
     def leaf_detect_src_callback(self):
