@@ -37,7 +37,7 @@ class VisionNode:
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
         
-        self.my_tcp = tcp()
+        self.my_tcp = tcp(ip="192.168.8.225")
         self.my_tcp_thread = threading.Thread(target=self.my_tcp.start)
         self.my_tcp_thread.start()
         print("TCP is ready")
@@ -81,14 +81,14 @@ class VisionNode:
     def leaf_detect_src(self):
         if self.my_tcp.decimg is None:
             return
-        # start = time.time()
+        start = time.time()
         self.frame = self.my_tcp.decimg
         detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         if detect_res is not None and len(detect_res):
             for each_leaf in detect_res:
                 *xywh, conf, class_index = each_leaf
-        # fps  = 1/(time.time() - start)
-        # print(int(fps))
+        fps  = 1/(time.time() - start)
+        print(int(fps))
         
     def MainLoop(self):
         while not rospy.is_shutdown():
