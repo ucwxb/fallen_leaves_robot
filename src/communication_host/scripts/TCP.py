@@ -58,8 +58,8 @@ class tcp:
                 time.sleep(1)
         
         encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
+        self.cap = cv2.VideoCapture(0)
         while 1:
-            self.cap = cv2.VideoCapture(0)
             ret, frame = self.cap.read()
             time.sleep(0.01)
             result, imgencode = cv2.imencode('.jpg', frame, encode_param)

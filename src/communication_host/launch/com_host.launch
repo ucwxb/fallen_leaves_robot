@@ -2,7 +2,7 @@
 
 
     <param name="/pkg_path/communication_host" value="$(find communication_host)" />
-    <param name="/cam_index" value="14" />
+    <param name="/cam_index" value="0" />
     <node name = "communication_host_node" pkg = "communication_host" type="com_host.py" output = "screen"/>
     <!--
     <node name = "test_vision_node" pkg = "vision" type="testVis.py" output = "screen"/>
