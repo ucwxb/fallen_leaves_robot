@@ -16,7 +16,7 @@ class ComHostNode:
         # self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))  #临时调试用
         
         # rospy.Service('/image_trans',image_trans, self.Callback)  #建立服务
-        self.my_tcp = tcp(ip="192.168.8.225",isserver=False)
+        self.my_tcp = tcp(ip="192.168.43.223",isserver=False)
         self.my_tcp.start()
 
     def Callback(self, data):

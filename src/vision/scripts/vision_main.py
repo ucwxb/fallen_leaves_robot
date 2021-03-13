@@ -37,7 +37,7 @@ class VisionNode:
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
         
-        self.my_tcp = tcp(ip="192.168.8.225")
+        self.my_tcp = tcp(ip="192.168.43.223")
         self.my_tcp_thread = threading.Thread(target=self.my_tcp.start)
         self.my_tcp_thread.start()
         print("TCP is ready")
