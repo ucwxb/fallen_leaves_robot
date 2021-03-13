@@ -13,7 +13,7 @@ class ComHostNode:
         
         self.rate = rospy.Rate(20)
 
-        self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))  #临时调试用
+        # self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))  #临时调试用
         
         # rospy.Service('/image_trans',image_trans, self.Callback)  #建立服务
         self.my_tcp = tcp(isserver=False)

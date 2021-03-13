@@ -9,9 +9,9 @@ import json
 from vision.srv import *
 from vision.msg import leaf_msg
 from CamTrans import CameraTrans
-
+import time
 from TCP import tcp
-
+import threading
 from communication_host.srv import *
 class VisionNode:
     def __init__(self):
@@ -33,13 +33,15 @@ class VisionNode:
         self.cameraInfo.SetLocation(cameraX_robot, cameraY_robot, cameraZ_robot,
                                     cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
-         self.index = 0
 
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
-
+        
         self.my_tcp = tcp()
-        self.my_tcp.start()
+        self.my_tcp_thread = threading.Thread(target=self.my_tcp.start)
+        self.my_tcp_thread.start()
+        print("TCP is ready")
+        
 
     def get_img(self):
         start_time = time.time()  #计算ros传输帧数
@@ -54,11 +56,8 @@ class VisionNode:
         return img
         
     def leaf_detect_src_callback(self):
-        self.index+=1
-        # self.frame = self.get_img()
-        self.frame = self.my_tcp.decimg.copy()
-
-        # _, self.frame = self.cap.read()
+        self.frame = self.get_img()
+        cv2.imshow("win",self.frame)
         detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         leaf_detect_srv_res = leaf_detect_srvResponse()
         if detect_res is not None and len(detect_res):
@@ -75,28 +74,26 @@ class VisionNode:
                 leaf_detect_srv_res.res.append(new_leaf_msg)
         else:
             leaf_detect_srv_res.isFind = 0
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            return
         return leaf_detect_srv_res
 
     def leaf_detect_src(self):
-        self.index+=1
-        # self.frame = self.get_img()
         if self.my_tcp.decimg is None:
             return
-        print(self.my_tcp.decimg)
-        self.frame = self.my_tcp.decimg.copy()
-        cv2.imshow("win",self.frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            return
-        # _, self.frame = self.cap.read()
+        # start = time.time()
+        self.frame = self.my_tcp.decimg
         detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         if detect_res is not None and len(detect_res):
             for each_leaf in detect_res:
                 *xywh, conf, class_index = each_leaf
-                print(class_index,conf)
+        # fps  = 1/(time.time() - start)
+        # print(int(fps))
         
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
+            # self.leaf_detect_src_callback()
             self.leaf_detect_src()
             
 if __name__ == '__main__':
