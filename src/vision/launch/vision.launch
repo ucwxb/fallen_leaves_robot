@@ -2,8 +2,8 @@
 
 
     <param name="/pkg_path/vision" value="$(find vision)" />
-    <param name="/pt_path" value="/scripts/v5l-last.pt" />
-    <param name="/cam_index" value="2" />
+    <param name="/pt_path" value="/scripts/v5s-last.pt" />
+    <param name="/cam_index" value="0" />
     <param name="/camera_relativeLocation/x" value="0" />
     <param name="/camera_relativeLocation/y" value="0" />
     <param name="/camera_relativeLocation/z" value="0" />

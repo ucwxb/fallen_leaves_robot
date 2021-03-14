@@ -38,10 +38,12 @@ class tcp:
         print('connect from:'+str(addr))
         self.isReading = False
         while 1:
+            # start = time.time()
             length = self.recvall(conn,16)
             stringData = self.recvall(conn, int(length))
             data = numpy.frombuffer(stringData, numpy.uint8)
             self.decimg=cv2.imdecode(data,cv2.IMREAD_COLOR)
+            # print("fps:",1/(time.time() - start))
         s.close()
     
        
