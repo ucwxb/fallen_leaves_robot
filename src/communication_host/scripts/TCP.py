@@ -61,7 +61,7 @@ class tcp:
         self.cap = cv2.VideoCapture(0)
         while 1:
             ret, frame = self.cap.read()
-            time.sleep(0.01)
+            time.sleep(0.1)
             result, imgencode = cv2.imencode('.jpg', frame, encode_param)
             data = numpy.array(imgencode)
             stringData = data.tostring()
