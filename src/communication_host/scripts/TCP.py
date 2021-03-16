@@ -9,7 +9,7 @@ import numpy
 
 
 class tcp:
-    def __init__(self,ip = '192.168.43.155',port = 8888,isserver=True):
+    def __init__(self,ip = '192.168.8.216',port = 8888,isserver=True):
         self.isserver=isserver
         self.decimg = None
         self.ip = ip
