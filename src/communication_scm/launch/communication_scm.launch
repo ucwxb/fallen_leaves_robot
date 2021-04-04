@@ -2,7 +2,9 @@
 
 
     <param name="/pkg_path/communication_scm" value="$(find communication_scm)" />
+    <param name="/serial_path" value="/dev/tty" />
+    <param name="/serial_rate" value="115200" />
 
-    <node name = "communication_scm_node" pkg = "communication_scm" type="communication_scm_main.py" output = "screen"/>
+    <node name = "communication_scm_node" pkg = "communication_scm" type="communication_main.py" output = "screen"/>
 
 </launch>
