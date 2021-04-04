@@ -6,6 +6,7 @@ import time
 import threading
 import rospy
 from std_msgs.msg import String,Int32
+from communication_main.msg import plc_cmd,stm_vel_cmd
 class Com:
     def __init__(self):
         rospy.init_node('communication_node', anonymous = True)
@@ -16,11 +17,14 @@ class Com:
 
         self.rate = rospy.Rate(20)
 
-        rospy.Subscriber("/send_stm32",Int32,self.send_stm32)
+        rospy.Subscriber("/send_stm32",String,self.send_stm32_cb)
         self.receive_stm32 = rospy.Publisher("/receive_stm32", String,queue_size=1)
 
-        rospy.Subscriber("/send_plc",Int32,self.send_stm32)
+        rospy.Subscriber("/send_plc",String,self.send_plc_cb)
         self.receive_plc = rospy.Publisher("/receive_plc", String,queue_size=1)
+
+        rospy.Subscriber("/send_stm32_vel",stm_vel_cmd,self.send_stm32_vel)
+        rospy.Subscriber("/send_plc_cmd",plc_cmd,self.send_plc_cmd)
 
         self.init_serial()
         self.init_threading()
@@ -47,9 +51,12 @@ class Com:
         self.plc_t = threading.Thread(target=self.receive_plc_func)
         self.plc_t.start()
 
-    def send_stm32(self,msg):
+    def send_stm32_cb(self,msg):
         data = msg.data
-        self.ser.write(info)
+        self.send_stm32(data)
+
+    def send_stm32(self,string):
+        self.ser.write(string)
 
     def receive_stm32_func(self):
         while(1):
@@ -59,10 +66,20 @@ class Com:
                 print(res)
             else:
                 print("ser is cloesd")
+    
+    def send_stm32_vel(self,msg):
+        vel_x = msg.x
+        vel_y = msg.y
+        vel_yaw = msg.yaw
+        cmd_string = "x:"
+        self.send_stm32(cmd_string)
 
-    def send_plc(self,msg):
+    def send_plc_cb(self,msg):
         data = msg.data
-        self.plc_ser.write(info)
+        self.send_plc(data)
+    
+    def send_plc(self,string):
+        self.plc_ser.write(string)
     
     def receive_plc_func(self):
         while(1):
@@ -73,7 +90,13 @@ class Com:
             else:
                 print("ser is cloesd")
 
-
+    def send_plc_cmd(self,msg):
+        cmd_type = msg.type
+        cmd_fan_status = msg.fan_status
+        cmd_slide_status = msg.slide_status
+        cmd_slisde_dis = msg.slide_dis
+        cmd_string = "type:"
+        self.send_plc(cmd_string)
 
 
     def MainLoop(self):

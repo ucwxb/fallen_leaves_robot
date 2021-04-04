@@ -1,72 +1,38 @@
-import time
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy.interpolate import make_interp_spline as spline
+import numpy 
+import math
+import rospy
+class Axis_Info:
+    def __init__(self):
+        self.difference = 0
+        self.tempDiffer = 0 #上一个时刻
+        self.differential = 0
+        self.integral = 0
+        
 
 class PID:
-    def __init__(self, P=0.2, I=0.0, D=0.0):
-        self.kp = P
-        self.ki = I
-        self.kd = D
-
-        self.setValue = 0
-
-        self.lastErr = 0
-        self.errSum = 0
-        self.errSumLimit = 10
-
-        self.curList = []
-
-    def pidCalculate(self, curValue,Len):
-        for i in range(1, Len):
-            err = self.setValue - curValue
-            dErr = err - self.lastErr
-            self.lastErr = err
-
-            self.errSum += err
-        #if (self.errSum < -self.errSumLimit):
-            #self.errSum = -self.errSumLimit
-        #elif (self.errSum > self.errSumLimit):
-            #self.errSum = self.errSumLimit
-#抗积分饱和好像没有上面那个方法，如果需要我再写一个。
-
-            self.output = self.kp * err + (self.ki * self.errSum) + (self.kd * dErr)
-            curValue = self.output
-            time.sleep(0.01)
-            self.curList.append(curValue)
-
-        return self.curList
-
-
-def testPid(P = 0.2, I = 0.0, D = 0.0, Len = 100):
-    timeList = []
-    curValueList = []
-    setValueList = []
-    pid = PID(P, I, D)
-    curValue = 0
-    pid.setValue = 1.2
-    curValueList = pid.pidCalculate(curValue,Len)
-    for i in range(1,Len):
-        setValueList.append(pid.setValue)
-        timeList.append(i)
-
-    timeSm = np.array(timeList)
-    timeSmooth = np.linspace(timeSm.min(), timeSm.max(), 300)   #将x轴300等分
-    curValueSmooth = spline(timeList, curValueList)(timeSmooth) #插值.使原y轴数据平滑
-    plt.figure(0)
-    plt.plot(timeSmooth, curValueSmooth)
-    plt.plot(timeList, setValueList)
-    plt.xlim((0, Len))
-    plt.ylim((min(curValueList)-0.5, max(curValueList)+0.5))
-    plt.xlabel('time (s)')
-    plt.ylabel('PID (PV)')
-    plt.title('TEST PID')
-
-    plt.ylim((1-0.5, 1+0.5))
-
-    plt.grid(True)
-    plt.show()
-
-if __name__ == "__main__":
-    testPid(0.35, 0.6, 0.05, Len=80)
+    def __init__(self):
+        self.y_target = int(rospy.get_param("/y_target"))  # 0-480  480
+        self.x_target = int(rospy.get_param("/x_target"))  # 0-640  320
+        self.vel_P = float(rospy.get_param("/vel_P"))
+        self.vel_I = float(rospy.get_param("/vel_I"))
+        self.vel_D = float(rospy.get_param("/vel_D"))
+        self.w_P = float(rospy.get_param("/w_P"))
+        self.max_vel = float(rospy.get_param("/max_vel"))
+        self.Axis_Info_3 = [Axis_Info(),Axis_Info(),Axis_Info()]
+        self.cmd_vel_linear = [0,0,0]
+        self.cmd_vel_angular = [0,0,0]
+        self.expectPos = [self.x_target,self.y_target,0]
+    
+    def VelPIDController(self,leafPos):
+        for i in range(3):
+            self.Axis_Info_3[i].difference = self.expectPos[i]-leafPos[i]
+            self.Axis_Info_3[i].differential = self.Axis_Info_3[i].difference - self.Axis_Info_3[i].tempDiffer
+            self.Axis_Info_3[i].integral += self.Axis_Info_3[i].difference
+            self.Axis_Info_3[i].tempDiffer = self.Axis_Info_3[i].difference
+            self.cmd_vel_linear[i] = self.vel_P*self.Axis_Info_3[i].difference + self.vel_D*self.Axis_Info_3[i].differential + self.vel_I*self.Axis_Info_3[i].integral
+            if math.fabs(self.cmd_vel_linear[i])>=self.max_vel:
+                if self.cmd_vel_linear[i] >0:
+                    self.cmd_vel_linear[i]  = self.max_vel
+                else:
+                    self.cmd_vel_linear[i]  = -self.max_vel
+        return [self.cmd_vel_linear[0],self.cmd_vel_linear[1],0]
