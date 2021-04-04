@@ -4,7 +4,7 @@ import rospy
 import os
 from vision.msg import leaf_msg,leaf_detect_msg
 from PID import PID
-from communication_main.msg import stm_vel_cmd
+from communication_scm.msg import stm_vel_cmd
 class RoutePlanNode:
     def __init__(self):
     

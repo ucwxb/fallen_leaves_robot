@@ -1,6 +1,6 @@
 <launch>
     <include file="$(find main)/launch/param.launch"/>
-    <node name = "vision_node" pkg = "vision" type="vision_main.py" output = "screen"/>
-    <node name = "communication_scm_node" pkg = "communication_scm" type="communication_main.py" output = "screen"/>
-    <node name = "route_plan_node" pkg = "route_plan" type="route_plan_main.py" output = "screen"/>
+    <node name = "vision_node" pkg = "vision" type="vision_main.py"/>
+    <node name = "communication_scm_node" pkg = "communication_scm" type="communication_main.py"/>
+    <node name = "route_plan_node" pkg = "route_plan" type="route_plan_main.py"/>
 </launch>

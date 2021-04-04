@@ -6,7 +6,7 @@ import time
 import threading
 import rospy
 from std_msgs.msg import String,Int32
-from communication_main.msg import plc_cmd,stm_vel_cmd
+from communication_scm.msg import plc_cmd,stm_vel_cmd
 class Com:
     def __init__(self):
         rospy.init_node('communication_node', anonymous = True)
