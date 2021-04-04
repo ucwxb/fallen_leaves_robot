@@ -3,6 +3,6 @@
    <param name="/pkg_path/screen" value="$(find screen)"/>
    <param name="/pkg_path/communication_host" value="$(find communication_host)"/>
    <param name="/pkg_path/communication_scm" value="$(find communication_scm)"/>
-   <param name="/pkg_path/vision" value="$(vision)"/>
+   <param name="/pkg_path/vision" value="$(find vision)"/>
    <param name="/pkg_path/route_plan" value="$(find route_plan)"/>
 </launch>
