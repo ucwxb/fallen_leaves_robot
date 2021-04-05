@@ -15,4 +15,4 @@ vel_P: 0.1
 vel_I: 0
 vel_D: 0
 w_P: 0
-max_vel: 10
+max_vel: 5
