@@ -91,7 +91,7 @@ class Com:
         
         vel_y = struct.pack('f',vel_y)
         vel_yaw = struct.pack('f',vel_yaw)
-        print(vel_x,vel_y,vel_yaw)
+        # print(vel_x,vel_y,vel_yaw)
         msg_type = msg.type
         cmd_string = b''
         cmd_string += bytes([0xFF])
@@ -102,7 +102,7 @@ class Com:
             cmd_string += bytes([i])
         for i in vel_yaw:
             cmd_string += bytes([i])
-        print(cmd_string)
+        # print(cmd_string)
         self.send_stm32(cmd_string)
 
     def send_plc_cb(self,msg):

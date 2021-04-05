@@ -5,14 +5,14 @@ camera_relativeLocation:
   yaw: 0
   pitch: 0
 pt_path: v5s-last.pt
-serial_path: /dev/ttyUSB0
+serial_path: /dev/ttyUSB1
 cam_index: 0
 plc_serial_path: /dev/ttyUSB0
 serial_rate: 115200
 x_target: 0
 y_target: 320
-vel_P: 0.5
+vel_P: 0.1
 vel_I: 0
 vel_D: 0
 w_P: 0
-max_vel: 50
+max_vel: 10
