@@ -29,7 +29,7 @@ class detectImage:
         self.device = torch.device('cuda:0' if cuda else 'cpu')
 
     def loadPic(self,frame): #图像预处理
-        self.src_img = frame.copy()
+        # self.src_img = frame.copy()
         self.detect_img = frame
         img = letterbox(self.detect_img, new_shape=self.imgsz)[0]
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
@@ -58,7 +58,7 @@ class detectImage:
             pred = pred.cuda().data.cpu().numpy()
             frame = self.draw_box(pred,frame)
             pred[:4] = xyxy2xywh(pred[:4])
-            
+        
         return pred,frame
             
             #

@@ -1,4 +1,4 @@
-float32 x
-float32 y
-float32 yaw
+float64 x
+float64 y
+float64 yaw
 uint16 type

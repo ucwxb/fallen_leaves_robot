@@ -1,5 +1,5 @@
-float32 x
-float32 y
-float32 z
-float32 conf
+float64 x
+float64 y
+float64 z
+float64 conf
 uint8 class_index

@@ -29,7 +29,7 @@ class Com:
         rospy.Subscriber("/send_plc_cmd",plc_cmd,self.send_plc_cmd)
 
         self.init_serial()
-        self.init_threading()
+        # self.init_threading()
     
     def init_serial(self):
         times = 0
@@ -40,6 +40,7 @@ class Com:
                     self.ser = None
                     break
                 self.ser = serial.Serial(self.serial_path, self.serial_rate,timeout=1)
+                print("success connect to stm32")
                 break
             except:
                 times += 1
@@ -53,6 +54,7 @@ class Com:
                     self.plc_ser = None
                     break
                 self.plc_ser = serial.Serial(self.plc_serial_path, self.serial_rate,timeout=1)
+                print("success connect to plc")
                 break
             except:
                 times += 1

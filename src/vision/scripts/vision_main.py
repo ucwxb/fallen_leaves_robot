@@ -11,7 +11,6 @@ from CamTrans import CameraTrans
 import time
 from TCP import tcp
 import threading
-from communication_host.srv import *
 class VisionNode:
     def __init__(self):
     
@@ -35,7 +34,7 @@ class VisionNode:
         self.cameraInfo.SetLocation(cameraX_robot, cameraY_robot, cameraZ_robot,
                                     cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))
 
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
@@ -58,19 +57,19 @@ class VisionNode:
         # print(fps)
         return img
         
-    def leaf_detect_src_callback(self):
+    def leaf_detect_func(self):
         # self.frame = self.get_img()
         _,self.frame = self.cap.read()
-        start = time.time()
         detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         leaf_detect_res = leaf_detect_msg()
-        # leaf_detect_srv_res = leaf_detect_srvResponse()
+        
         if detect_res is not None and len(detect_res):
             leaf_detect_res.isFind = 1
+            
             for each_leaf in detect_res:
                 new_leaf_msg = leaf_msg()
                 *xywh, conf, class_index = each_leaf
-                new_leaf_msg.class_index = class_index
+                new_leaf_msg.class_index = int(class_index)
                 new_leaf_msg.conf = conf
                 # global_x,global_y,global_z = self.cameraInfo.img2global(xywh[0],xywh[1])
                 # new_leaf_msg.x = global_x
@@ -82,11 +81,11 @@ class VisionNode:
                 leaf_detect_res.res.append(new_leaf_msg)
         else:
             leaf_detect_res.isFind = 0
+            leaf_detect_res.res = []
         self.leaf_detect_topic.publish(leaf_detect_res)
         # cv2.imshow("win",self.frame)
-        # print(1/(time.time() - start))
         # if cv2.waitKey(1) & 0xFF == ord('q'):
-            # return
+        #     return
 
     def leaf_detect_src(self):
         if self.my_tcp.decimg is None:
@@ -107,7 +106,7 @@ class VisionNode:
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
-            self.leaf_detect_src_callback()
+            self.leaf_detect_func()
             #self.leaf_detect_src()
             
 if __name__ == '__main__':
