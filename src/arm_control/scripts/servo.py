@@ -59,7 +59,7 @@ class ArmCon:
         res = Int32MultiArray()
         res.data = self.current_angle
         self.read_servo_angle_topic.publish(res)
-        time.sleep(1)
+        time.sleep(0.3)
     
 
     def MainLoop(self):
