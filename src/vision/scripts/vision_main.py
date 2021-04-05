@@ -60,7 +60,10 @@ class VisionNode:
     def leaf_detect_func(self):
         # self.frame = self.get_img()
         _,self.frame = self.cap.read()
-        detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
+        try:
+            detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
+        except:
+            return
         leaf_detect_res = leaf_detect_msg()
         
         if detect_res is not None and len(detect_res):
@@ -75,17 +78,17 @@ class VisionNode:
                 # new_leaf_msg.x = global_x
                 # new_leaf_msg.y = global_y
                 # new_leaf_msg.z = global_z
-                new_leaf_msg.x = xywh[0]
-                new_leaf_msg.y = 480.0-xywh[1]
+                new_leaf_msg.x = 480.0-xywh[1]
+                new_leaf_msg.y = xywh[0] - 320.0
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
         else:
             leaf_detect_res.isFind = 0
             leaf_detect_res.res = []
         self.leaf_detect_topic.publish(leaf_detect_res)
-        # cv2.imshow("win",self.frame)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     return
+        cv2.imshow("win",self.frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            return
 
     def leaf_detect_src(self):
         if self.my_tcp.decimg is None:

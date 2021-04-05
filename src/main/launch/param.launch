@@ -1,6 +1,5 @@
 <launch> 
    <rosparam file="$(find main)/yaml/main.yaml" command="load" />
-   <param name="/pkg_path/communication_host" value="$(find communication_host)"/>
    <param name="/pkg_path/communication_scm" value="$(find communication_scm)"/>
    <param name="/pkg_path/vision" value="$(find vision)"/>
    <param name="/pkg_path/route_plan" value="$(find route_plan)"/>

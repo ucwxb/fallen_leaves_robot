@@ -25,7 +25,7 @@ class PID:
     
     def VelPIDController(self,leafPos):
         for i in range(3):
-            self.Axis_Info_3[i].difference = self.expectPos[i]-leafPos[i]
+            self.Axis_Info_3[i].difference = leafPos[i]-self.expectPos[i]
             self.Axis_Info_3[i].differential = self.Axis_Info_3[i].difference - self.Axis_Info_3[i].tempDiffer
             self.Axis_Info_3[i].integral += self.Axis_Info_3[i].difference
             self.Axis_Info_3[i].tempDiffer = self.Axis_Info_3[i].difference
