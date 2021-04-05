@@ -7,6 +7,7 @@ import threading
 import rospy
 from std_msgs.msg import String,Int32
 from communication_scm.msg import plc_cmd,stm_vel_cmd
+import struct
 class Com:
     def __init__(self):
         rospy.init_node('communication_node', anonymous = True)
@@ -30,18 +31,28 @@ class Com:
         self.init_threading()
     
     def init_serial(self):
+        times = 0
         while(1):
             try:
+                if times >= 2:
+                    print("failed to connect to stm32")
+                    break
                 self.ser = serial.Serial(self.serial_path, self.serial_rate,timeout=1)
                 break
             except:
+                times += 1
                 print("stm32 serial time out")
             time.sleep(1)
+        times = 0
         while(1):
             try:
+                if times >= 0:
+                    print("failed to connect to plc")
+                    break
                 self.plc_ser = serial.Serial(self.plc_serial_path, self.serial_rate,timeout=1)
                 break
             except:
+                times += 1
                 print("plc serial time out")
             time.sleep(1)
     
@@ -71,7 +82,19 @@ class Com:
         vel_x = msg.x
         vel_y = msg.y
         vel_yaw = msg.yaw
-        cmd_string = "x:"
+        vel_x = struct.pack('f',vel_x)
+        vel_y = struct.pack('f',vel_y)
+        vel_yaw = struct.pack('f',vel_yaw)
+        msg_type = msg.type
+        cmd_string = b''
+        cmd_string += bytes([0xFF])
+        cmd_string += bytes([msg_type])
+        for i in vel_x:
+            cmd_string += i
+        for i in vel_y:
+            cmd_string += i
+        for i in vel_yaw:
+            cmd_string += i
         self.send_stm32(cmd_string)
 
     def send_plc_cb(self,msg):
