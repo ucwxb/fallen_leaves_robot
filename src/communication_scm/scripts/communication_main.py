@@ -7,6 +7,7 @@ import threading
 import rospy
 from std_msgs.msg import String,Int32
 from communication_scm.msg import plc_cmd,stm_vel_cmd
+import numpy as np
 import struct
 class Com:
     def __init__(self):
@@ -34,8 +35,9 @@ class Com:
         times = 0
         while(1):
             try:
-                if times >= 2:
+                if times >= 1:
                     print("failed to connect to stm32")
+                    self.ser = None
                     break
                 self.ser = serial.Serial(self.serial_path, self.serial_rate,timeout=1)
                 break
@@ -46,8 +48,9 @@ class Com:
         times = 0
         while(1):
             try:
-                if times >= 0:
+                if times >= 2:
                     print("failed to connect to plc")
+                    self.plc_ser = None
                     break
                 self.plc_ser = serial.Serial(self.plc_serial_path, self.serial_rate,timeout=1)
                 break
@@ -58,9 +61,9 @@ class Com:
     
     def init_threading(self):
         self.t = threading.Thread(target=self.receive_stm32_func)
-        self.t.start()
+        # self.t.start()
         self.plc_t = threading.Thread(target=self.receive_plc_func)
-        self.plc_t.start()
+        # self.plc_t.start()
 
     def send_stm32_cb(self,msg):
         data = msg.data
@@ -70,31 +73,34 @@ class Com:
         self.ser.write(string)
 
     def receive_stm32_func(self):
-        while(1):
-            if self.ser.isOpen():
-                res = str(self.ser.readall())
+        # while(1):
+        if self.ser != None and self.ser.isOpen():
+            res = self.ser.readall()
+            res = bytes.decode(res)
+            if res != '':
                 self.receive_stm32.publish(res)
                 print(res)
-            else:
-                print("ser is cloesd")
     
     def send_stm32_vel(self,msg):
         vel_x = msg.x
         vel_y = msg.y
         vel_yaw = msg.yaw
         vel_x = struct.pack('f',vel_x)
+        
         vel_y = struct.pack('f',vel_y)
         vel_yaw = struct.pack('f',vel_yaw)
+        print(vel_x,vel_y,vel_yaw)
         msg_type = msg.type
         cmd_string = b''
         cmd_string += bytes([0xFF])
         cmd_string += bytes([msg_type])
         for i in vel_x:
-            cmd_string += i
+            cmd_string += bytes([i])
         for i in vel_y:
-            cmd_string += i
+            cmd_string += bytes([i])
         for i in vel_yaw:
-            cmd_string += i
+            cmd_string += bytes([i])
+        print(cmd_string)
         self.send_stm32(cmd_string)
 
     def send_plc_cb(self,msg):
@@ -105,26 +111,31 @@ class Com:
         self.plc_ser.write(string)
     
     def receive_plc_func(self):
-        while(1):
-            if self.plc_ser.isOpen():
-                res = str(self.plc_ser.readall())
+        # while(1):
+        if self.plc_ser != None and self.plc_ser.isOpen():
+            res = self.plc_ser.readall()
+            res = bytes.decode(res)
+            if res != '':
                 self.receive_plc.publish(res)
                 print(res)
-            else:
-                print("ser is cloesd")
 
     def send_plc_cmd(self,msg):
-        cmd_type = msg.type
-        cmd_fan_status = msg.fan_status
-        cmd_slide_status = msg.slide_status
         cmd_slisde_dis = msg.slide_dis
-        cmd_string = "type:"
+        cmd_arm_dis = msg.arm_dis
+        if np.fabs(cmd_slisde_dis)>250:
+            cmd_slisde_dis = 0
+        if np.fabs(cmd_arm_dis)>250:
+            cmd_arm_dis = 0
+        cmd_string = "%d %d"%(cmd_slisde_dis,cmd_arm_dis)
+        cmd_string = bytes(cmd_string,encoding="utf8")
         self.send_plc(cmd_string)
 
 
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
+            self.receive_plc_func()
+            self.receive_stm32_func()
             
 
 if __name__ == '__main__':
