@@ -27,6 +27,7 @@ class RoutePlanNode:
             stm_vel.x = res[0]
             stm_vel.y = res[1]
             stm_vel.yaw = res[2]
+            stm_vel.type = 1
             self.send_stm32_vel.publish(stm_vel)
             self.is_handle = 0
         
