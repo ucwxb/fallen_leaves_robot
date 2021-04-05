@@ -11,8 +11,8 @@ plc_serial_path: /dev/ttyUSB0
 serial_rate: 115200
 x_target: 0
 y_target: 320
-vel_P: 0.0005
+vel_P: 0.5
 vel_I: 0
 vel_D: 0
 w_P: 0
-max_vel: 0.5
+max_vel: 50
