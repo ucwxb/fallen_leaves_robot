@@ -1,0 +1,6 @@
+int32 angle1
+int32 angle2
+int32 angle3
+int32 angle4
+int32 angle5
+int32 angle6

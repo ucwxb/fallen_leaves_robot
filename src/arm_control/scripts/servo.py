@@ -4,6 +4,7 @@ import math
 from Arm_Lib import Arm_Device
 import rospy
 from std_msgs.msg import UInt32,UInt32MultiArray,Int32MultiArray
+from arm_control.msg import * 
 class ArmCon:
     def __init__(self):
         rospy.init_node('gesture_recogniton', anonymous=True)
@@ -17,7 +18,7 @@ class ArmCon:
         self.angle_list = [angle1,angle2,angle3,angle4]
         self.current_angle = [0,0,0,0,0,0]
         rospy.Subscriber("/servo_angle_control_topic",UInt32,self.servo_angle_control_topic_cb)
-        rospy.Subscriber("/servo_manual_control_topic",UInt32MultiArray,self.servo_manual_control_topic_cb)
+        rospy.Subscriber("/servo_manual_control_topic",manual,self.servo_manual_control_topic_cb)
         self.read_servo_angle_topic = rospy.Publisher("/read_servo_angle_topic",Int32MultiArray,queue_size=1)
     
     def ctrl_all_servo(self,angle, s_time = 500):
@@ -34,7 +35,19 @@ class ArmCon:
             self.ctrl_all_servo(self.angle_list[3],s_time=500)
 
     def servo_manual_control_topic_cb(self,msg):
-        msg_angle_list = msg.data
+        angle1 = msg.angle1
+        angle2 = msg.angle2
+        angle3 = msg.angle3
+        angle4 = msg.angle4
+        angle5 = msg.angle5
+        angle6 = msg.angle6
+        msg_angle_list = []
+        msg_angle_list.append(angle1)
+        msg_angle_list.append(angle2)
+        msg_angle_list.append(angle3)
+        msg_angle_list.append(angle4)
+        msg_angle_list.append(angle5)
+        msg_angle_list.append(angle6)
         self.ctrl_all_servo(msg_angle_list,s_time=500)
 
     def read_servo_angle(self):
