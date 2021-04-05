@@ -1,0 +1,5 @@
+<launch>
+	
+    <param name="/pkg_path/arm_control" value="$(find arm_control)"/>
+    <node name="servo_node" pkg="arm_control" type="servo.py"  />
+</launch>
