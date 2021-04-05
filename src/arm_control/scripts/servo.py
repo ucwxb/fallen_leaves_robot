@@ -43,7 +43,9 @@ class ArmCon:
             if self.current_angle[i] == None:
                 self.current_angle[i] = -1
             time.sleep(.1)
-        self.read_servo_angle_topic.publish(self.current_angle)
+        res = Int32MultiArray()
+        res.data = self.current_angle
+        self.read_servo_angle_topic.publish(res)
         time.sleep(1)
     
 
