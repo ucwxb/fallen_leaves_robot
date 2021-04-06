@@ -28,11 +28,12 @@ class RoutePlanNode:
         self.current_mode %= len(MODE)
 
     def leaf_detect_cb(self,msg):
+        stm_vel = stm_vel_cmd()
         if self.is_handle == 0 and msg.isFind == 1 and self.current_mode == RUN:
             self.is_handle = 1
             one_leaf_info = msg.res[0]
             leafPos = [one_leaf_info.x,one_leaf_info.y,0]
-            stm_vel = stm_vel_cmd()
+            
             res = self.pid.VelPIDController(leafPos)
             stm_vel.x = res[0]
             stm_vel.y = res[1]
@@ -40,6 +41,13 @@ class RoutePlanNode:
             stm_vel.type = 1
             self.send_stm32_vel.publish(stm_vel)
             self.is_handle = 0
+        else:
+            stm_vel.x = 0
+            stm_vel.y = 0
+            stm_vel.yaw = 0
+            self.send_stm32_vel.publish(stm_vel)
+
+
         
     def MainLoop(self):
         while not rospy.is_shutdown():

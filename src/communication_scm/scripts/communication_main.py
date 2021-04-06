@@ -111,6 +111,7 @@ class Com:
             vel_y = self.filter(vel_y,self.max_vel,self.min_vel)
         if vel_yaw != 0:
             vel_yaw = self.filter(vel_yaw,self.max_ang_vel,self.min_ang_vel)
+        print(vel_x,vel_y,vel_yaw)
         vel_x = struct.pack('f',vel_x)
         
         vel_y = struct.pack('f',vel_y)
