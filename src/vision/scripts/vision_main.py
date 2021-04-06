@@ -86,9 +86,9 @@ class VisionNode:
             leaf_detect_res.isFind = 0
             leaf_detect_res.res = []
         self.leaf_detect_topic.publish(leaf_detect_res)
-        cv2.imshow("win",self.frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            return
+        # cv2.imshow("win",self.frame)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     return
 
     def leaf_detect_src(self):
         if self.my_tcp.decimg is None:
