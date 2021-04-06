@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QWidget, QColor, QPixmap, QIcon, QSize, QCheckBox
 from PyQt5.QtWidgets import QApplication,QMainWindow
 import rospy
-from communication_scm.msg import plc_cmd,stm_vel_cmd,stm_fan_cmd
+from communication_scm.msg import *
 from arm_control.msg import * 
 from std_msgs.msg import UInt32,UInt32MultiArray,Int32MultiArray
 from PyQt5.QtCore import Qt,QTimer

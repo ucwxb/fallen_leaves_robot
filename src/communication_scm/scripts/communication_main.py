@@ -6,7 +6,7 @@ import time
 import threading
 import rospy
 from std_msgs.msg import String,Int32
-from communication_scm.msg import plc_cmd,stm_vel_cmd,stm_fan_cmd
+from communication_scm.msg import *
 import numpy as np
 import struct
 class Com:
@@ -27,6 +27,7 @@ class Com:
 
         rospy.Subscriber("/send_stm32_vel",stm_vel_cmd,self.send_stm32_vel)
         rospy.Subscriber("/send_stm32_fan",stm_fan_cmd,self.send_stm32_fan)
+        rospy.Subscriber("/send_stm32_brush",stm_brush_cmd,self.send_stm32_brush)
         rospy.Subscriber("/send_plc_cmd",plc_cmd,self.send_plc_cmd)
 
         self.init_serial()
@@ -103,7 +104,7 @@ class Com:
         vel_x = msg.x
         vel_y = msg.y
         vel_yaw = msg.yaw
-        msg_type = msg.type
+        msg_type = 1
         if vel_x != 0:
             vel_x = self.filter(vel_x,self.max_vel,self.min_vel)
         if vel_y != 0:
@@ -129,7 +130,19 @@ class Com:
     
     def send_stm32_fan(self,msg):
         vel = msg.vel
-        msg_type = msg.type
+        msg_type = 3
+        vel = struct.pack('f',vel)
+        cmd_string = b''
+        cmd_string += bytes([0xFF])
+        cmd_string += bytes([msg_type])
+        for i in vel:
+            cmd_string += bytes([i])
+        # print(cmd_string)
+        self.send_stm32(cmd_string)
+    
+    def send_stm32_brush(self,msg):
+        vel = msg.vel
+        msg_type = 2
         vel = struct.pack('f',vel)
         cmd_string = b''
         cmd_string += bytes([0xFF])
