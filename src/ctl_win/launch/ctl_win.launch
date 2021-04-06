@@ -1,0 +1,5 @@
+<launch>
+
+    <node name = "ctl_win_node" pkg = "ctl_win" type="ctlmain.py" output = "screen"/>
+
+</launch>
