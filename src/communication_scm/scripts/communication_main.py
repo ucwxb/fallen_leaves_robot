@@ -6,7 +6,7 @@ import time
 import threading
 import rospy
 from std_msgs.msg import String,Int32
-from communication_scm.msg import plc_cmd,stm_vel_cmd
+from communication_scm.msg import plc_cmd,stm_vel_cmd,stm_fan_cmd
 import numpy as np
 import struct
 class Com:
@@ -26,10 +26,16 @@ class Com:
         self.receive_plc = rospy.Publisher("/receive_plc", String,queue_size=1)
 
         rospy.Subscriber("/send_stm32_vel",stm_vel_cmd,self.send_stm32_vel)
+        rospy.Subscriber("/send_stm32_fan",stm_fan_cmd,self.send_stm32_fan)
         rospy.Subscriber("/send_plc_cmd",plc_cmd,self.send_plc_cmd)
 
         self.init_serial()
         # self.init_threading()
+        
+        self.max_vel = rospy.get_param("/max_vel")
+        self.min_vel = rospy.get_param("/min_vel")
+        self.max_ang_vel = rospy.get_param("/max_ang_vel")
+        self.min_ang_vel = rospy.get_param("/min_ang_vel")
     
     def init_serial(self):
         times = 0
@@ -75,7 +81,6 @@ class Com:
         self.ser.write(string)
 
     def receive_stm32_func(self):
-        # while(1):
         if self.ser != None and self.ser.isOpen():
             res = self.ser.readall()
             res = bytes.decode(res)
@@ -83,16 +88,33 @@ class Com:
                 self.receive_stm32.publish(res)
                 print(res)
     
+    def filter(self,src,max_num,min_num):
+        if np.fabs(src) >= np.fabs(max_num):
+            if src < 0:
+                return -max_num
+            return max_num
+        if np.fabs(src) <= np.fabs(min_num):
+            if src < 0:
+                return -min_num
+            return min_num
+        return src
+
     def send_stm32_vel(self,msg):
         vel_x = msg.x
         vel_y = msg.y
         vel_yaw = msg.yaw
+        msg_type = msg.type
+        if vel_x != 0:
+            vel_x = self.filter(vel_x,self.max_vel,self.min_vel)
+        if vel_y != 0:
+            vel_y = self.filter(vel_y,self.max_vel,self.min_vel)
+        if vel_yaw != 0:
+            vel_yaw = self.filter(vel_yaw,self.max_ang_vel,self.min_ang_vel)
         vel_x = struct.pack('f',vel_x)
         
         vel_y = struct.pack('f',vel_y)
         vel_yaw = struct.pack('f',vel_yaw)
         # print(vel_x,vel_y,vel_yaw)
-        msg_type = msg.type
         cmd_string = b''
         cmd_string += bytes([0xFF])
         cmd_string += bytes([msg_type])
@@ -101,6 +123,18 @@ class Com:
         for i in vel_y:
             cmd_string += bytes([i])
         for i in vel_yaw:
+            cmd_string += bytes([i])
+        # print(cmd_string)
+        self.send_stm32(cmd_string)
+    
+    def send_stm32_fan(self,msg):
+        vel = msg.vel
+        msg_type = msg.type
+        vel = struct.pack('f',vel)
+        cmd_string = b''
+        cmd_string += bytes([0xFF])
+        cmd_string += bytes([msg_type])
+        for i in vel:
             cmd_string += bytes([i])
         # print(cmd_string)
         self.send_stm32(cmd_string)

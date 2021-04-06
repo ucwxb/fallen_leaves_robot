@@ -52,6 +52,7 @@ add_message_files(
   FILES
   plc_cmd.msg
   stm_vel_cmd.msg
+  stm_fan_cmd.msg
   #leaf_msg.msg
 #   Message2.msg
 )
