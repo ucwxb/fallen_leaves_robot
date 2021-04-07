@@ -6,6 +6,7 @@ from vision.msg import leaf_msg,leaf_detect_msg
 from std_msgs.msg import Empty
 from PID import PID
 from communication_scm.msg import stm_vel_cmd
+import numpy as np
 STOP = 0
 RUN = 1
 MODE = [STOP,RUN]
@@ -27,18 +28,22 @@ class RoutePlanNode:
         self.current_mode += 1
         self.current_mode %= len(MODE)
 
+    def get_leaf_pos(self,res):
+        distance = []
+        for each_res in res:
+            distance.append(np.square(each_res.x)+np.square(each_res.y))
+        index = np.argmin(distance)
+        return [res[index].x,res[index].y,0]
+
     def leaf_detect_cb(self,msg):
         stm_vel = stm_vel_cmd()
         if self.is_handle == 0 and msg.isFind == 1 and self.current_mode == RUN:
             self.is_handle = 1
-            one_leaf_info = msg.res[0]
-            leafPos = [one_leaf_info.x,one_leaf_info.y,0]
-            
+            leafPos = self.get_leaf_pos(msg.res)
             res = self.pid.VelPIDController(leafPos)
             stm_vel.x = res[0]
             stm_vel.y = res[1]
             stm_vel.yaw = res[2]
-            stm_vel.type = 1
             self.send_stm32_vel.publish(stm_vel)
             self.is_handle = 0
         else:
@@ -46,8 +51,6 @@ class RoutePlanNode:
             stm_vel.y = 0
             stm_vel.yaw = 0
             self.send_stm32_vel.publish(stm_vel)
-
-
         
     def MainLoop(self):
         while not rospy.is_shutdown():

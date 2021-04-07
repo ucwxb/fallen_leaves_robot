@@ -11,6 +11,8 @@ from CamTrans import CameraTrans
 import time
 from TCP import tcp
 import threading
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
 class VisionNode:
     def __init__(self):
     
@@ -35,7 +37,10 @@ class VisionNode:
                                     cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
         self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))
-
+        
+        self.frame = np.zeros((640,480))
+        self.bridge = CvBridge()
+        self.leaf_image_topic = rospy.Publisher("/leaf_image", Image,queue_size=1)
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
         '''
@@ -44,21 +49,8 @@ class VisionNode:
         self.my_tcp_thread.start()
         print("TCP is ready")
         '''
-
-    def get_img(self):
-        start_time = time.time()  #计算ros传输帧数
-        img = self.srv_getImg().img
-        img = np.array(img,dtype="uint8")
-        img = img.reshape(len(img),1)
-        # img = [[x] for x in img]
-        img = cv2.imdecode(img,cv2.IMREAD_COLOR)
-        end_time  = time.time()  #计算ros传输帧数
-        fps = 1/(end_time-start_time)
-        # print(fps)
-        return img
         
     def leaf_detect_func(self):
-        # self.frame = self.get_img()
         _,self.frame = self.cap.read()
         try:
             detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
@@ -85,26 +77,13 @@ class VisionNode:
         else:
             leaf_detect_res.isFind = 0
             leaf_detect_res.res = []
+        img_msg = self.bridge.imgcv2_to_msg(self.frame, 'rgb8')
+        self.leaf_image_topic.publish(img_msg)
         self.leaf_detect_topic.publish(leaf_detect_res)
         # cv2.imshow("win",self.frame)
         # if cv2.waitKey(1) & 0xFF == ord('q'):
         #     return
 
-    def leaf_detect_src(self):
-        if self.my_tcp.decimg is None:
-            return
-        # start = time.time()
-        self.frame = self.my_tcp.decimg.copy()
-
-        detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
-        if detect_res is not None and len(detect_res):
-            for each_leaf in detect_res:
-                *xywh, conf, class_index = each_leaf
-        # fps  = 1/(time.time() - start)
-        # cv2.imshow("main_win",self.frame)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-            # return
-        # print(int(fps))
         
     def MainLoop(self):
         while not rospy.is_shutdown():

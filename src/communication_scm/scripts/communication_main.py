@@ -31,12 +31,6 @@ class Com:
         rospy.Subscriber("/send_plc_cmd",plc_cmd,self.send_plc_cmd)
 
         self.init_serial()
-        # self.init_threading()
-        
-        self.max_vel = rospy.get_param("/max_vel")
-        self.min_vel = rospy.get_param("/min_vel")
-        self.max_ang_vel = rospy.get_param("/max_ang_vel")
-        self.min_ang_vel = rospy.get_param("/min_ang_vel")
     
     def init_serial(self):
         times = 0
@@ -87,33 +81,14 @@ class Com:
             res = bytes.decode(res)
             if res != '':
                 self.receive_stm32.publish(res)
-                print(res)
-    
-    def filter(self,src,max_num,min_num):
-        if np.fabs(src) >= np.fabs(max_num):
-            if src < 0:
-                return -max_num
-            return max_num
-        if np.fabs(src) <= np.fabs(min_num):
-            if src < 0:
-                return -min_num
-            return min_num
-        return src
 
     def send_stm32_vel(self,msg):
         vel_x = msg.x
         vel_y = msg.y
         vel_yaw = msg.yaw
         msg_type = 1
-        if vel_x != 0:
-            vel_x = self.filter(vel_x,self.max_vel,self.min_vel)
-        if vel_y != 0:
-            vel_y = self.filter(vel_y,self.max_vel,self.min_vel)
-        if vel_yaw != 0:
-            vel_yaw = self.filter(vel_yaw,self.max_ang_vel,self.min_ang_vel)
-        print(vel_x,vel_y,vel_yaw)
+
         vel_x = struct.pack('f',vel_x)
-        
         vel_y = struct.pack('f',vel_y)
         vel_yaw = struct.pack('f',vel_yaw)
         # print(vel_x,vel_y,vel_yaw)
@@ -138,7 +113,6 @@ class Com:
         cmd_string += bytes([msg_type])
         for i in vel:
             cmd_string += bytes([i])
-        # print(cmd_string)
         self.send_stm32(cmd_string)
     
     def send_stm32_brush(self,msg):
@@ -161,13 +135,11 @@ class Com:
         self.plc_ser.write(string)
     
     def receive_plc_func(self):
-        # while(1):
         if self.plc_ser != None and self.plc_ser.isOpen():
             res = self.plc_ser.readall()
             res = bytes.decode(res)
             if res != '':
                 self.receive_plc.publish(res)
-                print(res)
 
     def send_plc_cmd(self,msg):
         cmd_slisde_dis = msg.slide_dis
