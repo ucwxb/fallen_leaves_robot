@@ -46,12 +46,9 @@ class VisionNode:
         # self.leaf_image_topic = rospy.Publisher("/leaf_image", Image,queue_size=1)
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
-        '''
-        self.my_tcp = tcp(ip="192.168.8.216") #192.168.8.225
-        self.my_tcp_thread = threading.Thread(target=self.my_tcp.start)
-        self.my_tcp_thread.start()
+        
+        self.my_tcp = tcp() #192.168.8.225
         print("TCP is ready")
-        '''
         
     def leaf_detect_func(self):
         _,self.frame = self.cap.read()
@@ -77,6 +74,7 @@ class VisionNode:
                 new_leaf_msg.y = xywh[0] - 320.0
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
+            self.my_tcp.SendImg(self.frame)
             cv2.imwrite("%d.jpg"%self.index_img,self.frame)
         else:
             leaf_detect_res.isFind = 0

@@ -11,6 +11,7 @@ from arm_control.msg import *
 from std_msgs.msg import UInt32,UInt32MultiArray,Int32MultiArray,Empty
 from PyQt5.QtCore import Qt,QTimer
 # from cv_bridge import CvBridge
+from TCP import tcp
 # from sensor_msgs.msg import Image
 import numpy as np
 class Ui_CtlWin(object):
@@ -97,12 +98,14 @@ class Ui_CtlWin(object):
 
         self.lock = False
         self.frame = np.zeros((640,480))
+        self.my_tcp = tcp(ip='192.168.8.100',is_sender=False)
         # self.bridge = CvBridge()
         # rospy.Subscriber("/leaf_image", Image,self.cb_leaf_image)
 
 
     def cb_leaf_image(self,img_msg):
         if self.lock == False:
+            self.frame = self.my_tcp.ReceiveImg()
             # self.frame = self.bridge.imgmsg_to_cv2(img_msg, 'bgr8')
             self.lock = True
 
@@ -273,6 +276,7 @@ class Ui_CtlWin(object):
         self._vel[2] = msg.yaw
 
     def update_pic(self):
+        self.cb_leaf_image()
         img_rows,img_cols,channels = self.frame.shape
         bytesPerLine = channels * img_cols
         # cv2.cvtColor(self.frame,cv2.COLOR_BGR2RGB,self.frame)
