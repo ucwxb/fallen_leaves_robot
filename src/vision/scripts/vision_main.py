@@ -77,7 +77,7 @@ class VisionNode:
         else:
             leaf_detect_res.isFind = 0
             leaf_detect_res.res = []
-        img_msg = self.bridge.imgcv2_to_msg(self.frame, 'rgb8')
+        img_msg = self.bridge.cv2_to_imgmsg(self.frame, 'rgb8')
         self.leaf_image_topic.publish(img_msg)
         self.leaf_detect_topic.publish(leaf_detect_res)
         # cv2.imshow("win",self.frame)
