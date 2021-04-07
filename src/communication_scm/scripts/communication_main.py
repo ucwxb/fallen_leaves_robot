@@ -73,7 +73,8 @@ class Com:
         self.send_stm32(data)
 
     def send_stm32(self,string):
-        self.ser.write(string)
+        if self.ser != None:
+            self.ser.write(string)
 
     def receive_stm32_func(self):
         if self.ser != None and self.ser.isOpen():
@@ -132,7 +133,8 @@ class Com:
         self.send_plc(data)
     
     def send_plc(self,string):
-        self.plc_ser.write(string)
+        if self.plc_ser != None:
+            self.plc_ser.write(string)
     
     def receive_plc_func(self):
         if self.plc_ser != None and self.plc_ser.isOpen():
