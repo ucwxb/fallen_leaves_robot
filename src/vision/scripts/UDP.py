@@ -5,7 +5,7 @@ import threading
 
 
 class UDP_Manager:
-    def __init__(self, callback, buffSize = 2048, isServer = False, port = 8888, frequency = 50):
+    def __init__(self, callback, buffSize = 64 * 1024, isServer = False, port = 8888, frequency = 50):
         self.callback = callback
         self.buffSize = buffSize
         self.isServer = isServer
@@ -57,8 +57,6 @@ class UDP_Manager:
                 self.callback(recvData, recvAddr)
             
     def Send(self, data, addr):
-        print(addr)
-        print(data)
         self.sockUDP.sendto(data, addr)
 
     def Close(self):

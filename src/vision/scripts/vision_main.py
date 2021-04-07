@@ -49,6 +49,12 @@ class VisionNode:
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
 
         # self.my_tcp = tcp() #192.168.8.225
+        self.jpegQuality = 20
+        self.errImg[:,0:200] = [0, 0, 255]
+        self.errImg[:,220:420] = [0, 255, 0]
+        self.errImg[:,440:640] = [255, 0, 0]
+        self.errImgData = cv2.imencode('.jpg', self.errImg, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
+
         self.udp  = UDP_Manager(self.rev_data_cb,isServer=True)
         self.udp.Start()
         # print("TCP is ready")
@@ -81,9 +87,14 @@ class VisionNode:
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
 
-            self.jpegQuality = 20
             data = cv2.imencode('.jpg', self.frame, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
-            self.udp.Send(data,('192.168.8.100',8888))
+
+            if len(data) < 64000:
+                for target in self.targetDict.keys():
+                     self.udp.Send(data,('192.168.8.100',8888))
+            else:
+                for target in self.targetDict.keys():
+                     self.udp.Send(self.errImgData,('192.168.8.100',8888))
 
             # self.my_tcp.SendImg(self.frame)
             cv2.imwrite("%d.jpg"%self.index_img,self.frame)
