@@ -93,11 +93,9 @@ class VisionNode:
             data = cv2.imencode('.jpg', self.frame, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
 
             if len(data) < 64000:
-                for target in self.targetDict.keys():
-                     self.udp.Send(data,('192.168.8.100',8888))
+                self.udp.Send(data,('192.168.8.100',8888))
             else:
-                for target in self.targetDict.keys():
-                     self.udp.Send(self.errImgData,('192.168.8.100',8888))
+                self.udp.Send(self.errImgData,('192.168.8.100',8888))
 
             # self.my_tcp.SendImg(self.frame)
             cv2.imwrite("%d.jpg"%self.index_img,self.frame)
