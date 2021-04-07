@@ -50,6 +50,7 @@ class VisionNode:
 
         # self.my_tcp = tcp() #192.168.8.225
         self.jpegQuality = 20
+        self.errImg = np.zeros((self.img_height, self.img_width, 3), np.uint8)
         self.errImg[:,0:200] = [0, 0, 255]
         self.errImg[:,220:420] = [0, 255, 0]
         self.errImg[:,440:640] = [255, 0, 0]
