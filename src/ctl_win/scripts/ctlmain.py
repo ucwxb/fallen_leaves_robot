@@ -107,8 +107,9 @@ class Ui_CtlWin(object):
 
 
     def cb_leaf_image(self,recvData, recvAddr):
-        if self.lock == False:
-            self.frame = recvData
+        if self.lock == False: 
+            data = np.frombuffer(recvData, dtype=np.uint8)
+            self.frame = cv2.imdecode(data, cv2.IMREAD_COLOR)
             # self.frame = self.bridge.imgmsg_to_cv2(img_msg, 'bgr8')
             self.lock = True
 

@@ -80,7 +80,11 @@ class VisionNode:
                 new_leaf_msg.y = xywh[0] - 320.0
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
-            self.udp.Send(self.frame,('192.168.8.100',8083))
+
+            self.jpegQuality = 20
+            data = cv2.imencode('.jpg', self.frame, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
+            self.udp.Send(data,('192.168.8.100',8083))
+            
             # self.my_tcp.SendImg(self.frame)
             cv2.imwrite("%d.jpg"%self.index_img,self.frame)
         else:
