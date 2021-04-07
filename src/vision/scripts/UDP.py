@@ -21,7 +21,7 @@ class UDP_Manager:
         #查询本机ip地址
         try:
             s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-            s.connect(('192.168.8.101',8888))
+            s.connect(('127.0.0.1',8888))
             self.ip = s.getsockname()[0]
         except:
             print('No Internet')
