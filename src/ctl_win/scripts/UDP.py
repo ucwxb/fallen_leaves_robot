@@ -57,6 +57,7 @@ class UDP_Manager:
                 self.callback(recvData, recvAddr)
             
     def Send(self, data, addr):
+        print(addr)
         self.sockUDP.sendto(data, addr)
 
     def Close(self):
