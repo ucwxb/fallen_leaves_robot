@@ -9,7 +9,8 @@ import json
 from vision.msg import leaf_msg,leaf_detect_msg
 from CamTrans import CameraTrans
 import time
-from TCP import tcp
+# from TCP import tcp
+from UDP import UDP_Manager
 import threading
 # from cv_bridge import CvBridge
 # from sensor_msgs.msg import Image
@@ -47,8 +48,13 @@ class VisionNode:
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
 
-        self.my_tcp = tcp() #192.168.8.225
-        print("TCP is ready")
+        # self.my_tcp = tcp() #192.168.8.225
+        self.udp  = UDP_Manager(self.rev_data_cb,isServer=True)
+        self.udp.Start()
+        # print("TCP is ready")
+    
+    def rev_data_cb(self,recvData, recvAddr):
+        print(recvData,recvAddr)
         
     def leaf_detect_func(self):
         _,self.frame = self.cap.read()
@@ -74,7 +80,8 @@ class VisionNode:
                 new_leaf_msg.y = xywh[0] - 320.0
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
-            self.my_tcp.SendImg(self.frame)
+            self.udp.Send(self.frame,'192.168.8.100')
+            # self.my_tcp.SendImg(self.frame)
             cv2.imwrite("%d.jpg"%self.index_img,self.frame)
         else:
             leaf_detect_res.isFind = 0

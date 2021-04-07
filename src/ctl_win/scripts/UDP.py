@@ -3,6 +3,7 @@ import time
 import struct
 import threading
 
+
 class UDP_Manager:
     def __init__(self, callback, buffSize = 2048, isServer = False, port = 8083, frequency = 50):
         self.callback = callback
@@ -20,8 +21,11 @@ class UDP_Manager:
         #查询本机ip地址
         try:
             s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-            s.connect(('8.8.8.8',80))
+            s.connect(('192.168.8.101',8888))
             self.ip = s.getsockname()[0]
+        except:
+            print('No Internet')
+            pass
         finally:
             s.close()
 
@@ -34,10 +38,7 @@ class UDP_Manager:
             self.roleName = 'Client'
         #获取本机名称
         self.myname = socket.getfqdn(socket.gethostname())
-        print(self.roleName, '(UDP) name：', self.myname)
         #获取本机ip
-        if self.isServer:
-            print(self.roleName, '(UDP) at:', self.ip, ':', self.port)
         self.running = True
         self.thread = threading.Thread(target = self.Receive, args=())
         self.thread.start()  #打开收数据的线程
@@ -49,7 +50,6 @@ class UDP_Manager:
             while self.running:
                 try:
                     recvData, recvAddr = self.sockUDP.recvfrom(self.buffSize) #等待接受数据
-                    print(recvData)
                 except:
                     break
                 if not recvData:
@@ -67,8 +67,14 @@ if __name__ == '__main__':
     def callback(x, y):
         print(x, y)
     
-    ip = '192.168.1.41'
-    a = UDP_Manager(callback, buffSize = 2048, isServer = True, port = 8848)
-    b = UDP_Manager(callback, buffSize = 2048, isServer = False, port = 8848)
+    ip = '127.0.0.1'
+    a = UDP_Manager(callback, buffSize = 2048, isServer = True, port = 8083)
+    b = UDP_Manager(callback, buffSize = 2048, isServer = False, port = 8084)
     a.Start()
     b.Start()
+
+
+
+
+
+    

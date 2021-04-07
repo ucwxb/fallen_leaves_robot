@@ -15,7 +15,7 @@ class tcp:
         self.ip = ip
         self.port = port
         self.address = (self.ip, self.port)
-
+        self.encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
         if self.is_sender:
             times = 0
             try:
@@ -32,7 +32,7 @@ class tcp:
             self.s.bind(self.address)
             self.s.listen(1)
             self.conn, self.target_addr = self.s.accept()
-            self.encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
+            
 
 
     def recvall(self,sock,count):

@@ -6,10 +6,10 @@ import time
 import sys
 import cv2
 import numpy
-
+import rospy
 
 class tcp:
-    def __init__(self,ip = '192.168.8.101',port = 8888,is_sender=True):
+    def __init__(self,ip = '192.168.8.100',port = 8888,is_sender=True):
         self.is_sender=is_sender
         self.decimg = None
         self.ip = ip
@@ -17,15 +17,9 @@ class tcp:
         self.address = (self.ip, self.port)
 
         if self.is_sender:
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.bind(self.address)
-            self.s.listen(1)
-            self.conn, addr = self.s.accept()
-            self.encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
-        else:
             times = 0
             try:
-                if times >= 2:
+                if times >= 100:
                     return
                 self.s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
                 self.s.connect(self.address)
@@ -33,6 +27,12 @@ class tcp:
                 print("not connect")
                 time.sleep(1)
                 times+=1
+        else:
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.s.bind(self.address)
+            self.s.listen(1)
+            self.conn, self.target_addr = self.s.accept()
+            self.encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
 
 
     def recvall(self,sock,count):
