@@ -9,7 +9,7 @@ import numpy
 import rospy
 
 class tcp:
-    def __init__(self,ip = '192.168.8.101',port = 8888,is_sender=True):
+    def __init__(self,ip = '192.168.8.100',port = 8888,is_sender=True):
         self.is_sender=is_sender
         self.decimg = None
         self.ip = ip

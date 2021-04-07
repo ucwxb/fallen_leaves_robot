@@ -46,7 +46,7 @@ class VisionNode:
         # self.leaf_image_topic = rospy.Publisher("/leaf_image", Image,queue_size=1)
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
-        
+
         self.my_tcp = tcp() #192.168.8.225
         print("TCP is ready")
         
