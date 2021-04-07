@@ -90,18 +90,22 @@ class VisionNode:
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
 
-            data = cv2.imencode('.jpg', self.frame, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
 
-            if len(data) < 64000:
-                self.udp.Send(data,('192.168.8.100',8888))
-            else:
-                self.udp.Send(self.errImgData,('192.168.8.100',8888))
 
             # self.my_tcp.SendImg(self.frame)
             cv2.imwrite("%d.jpg"%self.index_img,self.frame)
         else:
             leaf_detect_res.isFind = 0
             leaf_detect_res.res = []
+        
+        data = cv2.imencode('.jpg', self.frame, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
+
+        if len(data) < 64000:
+            target = ('192.168.8.100',8888)
+            self.udp.Send(b'123',target)
+            self.udp.Send(data,('192.168.8.100',8888))
+        else:
+            self.udp.Send(self.errImgData,('192.168.8.100',8888))
         
         # img_msg = self.bridge.cv2_to_imgmsg(self.frame, 'rgb8')
         # self.leaf_image_topic.publish(img_msg)
