@@ -11,8 +11,8 @@ from CamTrans import CameraTrans
 import time
 from TCP import tcp
 import threading
-from cv_bridge import CvBridge
-from sensor_msgs.msg import Image
+# from cv_bridge import CvBridge
+# from sensor_msgs.msg import Image
 class VisionNode:
     def __init__(self):
     
@@ -39,8 +39,11 @@ class VisionNode:
         self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))
         
         self.frame = np.zeros((640,480))
-        self.bridge = CvBridge()
-        self.leaf_image_topic = rospy.Publisher("/leaf_image", Image,queue_size=1)
+
+        self.index_img = 1
+
+        # self.bridge = CvBridge()
+        # self.leaf_image_topic = rospy.Publisher("/leaf_image", Image,queue_size=1)
         # rospy.wait_for_service('/image_trans')
         # self.srv_getImg = rospy.ServiceProxy('/image_trans',image_trans)
         '''
@@ -74,11 +77,13 @@ class VisionNode:
                 new_leaf_msg.y = xywh[0] - 320.0
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
+            cv2.imwrite("%d.jpg"%self.index_img,self.frame)
         else:
             leaf_detect_res.isFind = 0
             leaf_detect_res.res = []
-        img_msg = self.bridge.cv2_to_imgmsg(self.frame, 'rgb8')
-        self.leaf_image_topic.publish(img_msg)
+        
+        # img_msg = self.bridge.cv2_to_imgmsg(self.frame, 'rgb8')
+        # self.leaf_image_topic.publish(img_msg)
         self.leaf_detect_topic.publish(leaf_detect_res)
         # cv2.imshow("win",self.frame)
         # if cv2.waitKey(1) & 0xFF == ord('q'):

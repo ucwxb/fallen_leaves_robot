@@ -10,8 +10,8 @@ from communication_scm.msg import *
 from arm_control.msg import * 
 from std_msgs.msg import UInt32,UInt32MultiArray,Int32MultiArray,Empty
 from PyQt5.QtCore import Qt,QTimer
-from cv_bridge import CvBridge
-from sensor_msgs.msg import Image
+# from cv_bridge import CvBridge
+# from sensor_msgs.msg import Image
 import numpy as np
 class Ui_CtlWin(object):
 
@@ -97,13 +97,13 @@ class Ui_CtlWin(object):
 
         self.lock = False
         self.frame = np.zeros((640,480))
-        self.bridge = CvBridge()
-        rospy.Subscriber("/leaf_image", Image,self.cb_leaf_image)
+        # self.bridge = CvBridge()
+        # rospy.Subscriber("/leaf_image", Image,self.cb_leaf_image)
 
 
     def cb_leaf_image(self,img_msg):
         if self.lock == False:
-            self.frame = self.bridge.imgmsg_to_cv2(img_msg, 'bgr8')
+            # self.frame = self.bridge.imgmsg_to_cv2(img_msg, 'bgr8')
             self.lock = True
 
     def change_func(self):
