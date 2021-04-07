@@ -6,7 +6,7 @@ import time
 import sys
 import cv2
 import numpy
-
+import rospy
 
 class tcp:
     def __init__(self,ip = '192.168.8.101',port = 8888,is_sender=True):
@@ -21,6 +21,7 @@ class tcp:
             self.s.bind(self.address)
             self.s.listen(1)
             self.conn, addr = self.s.accept()
+            rospy.loginfo(self.conn)
             print(self.conn,addr)
             self.encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
         else:
