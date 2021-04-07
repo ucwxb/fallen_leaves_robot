@@ -98,12 +98,12 @@ class Ui_CtlWin(object):
 
         self.lock = False
         self.frame = np.zeros((640,480))
-        self.my_tcp = tcp(ip='192.168.8.100',is_sender=False)
+        self.my_tcp = tcp(is_sender=False)
         # self.bridge = CvBridge()
         # rospy.Subscriber("/leaf_image", Image,self.cb_leaf_image)
 
 
-    def cb_leaf_image(self,img_msg):
+    def cb_leaf_image(self):
         if self.lock == False:
             self.frame = self.my_tcp.ReceiveImg()
             # self.frame = self.bridge.imgmsg_to_cv2(img_msg, 'bgr8')

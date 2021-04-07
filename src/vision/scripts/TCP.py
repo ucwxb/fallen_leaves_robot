@@ -21,6 +21,7 @@ class tcp:
             self.s.bind(self.address)
             self.s.listen(1)
             self.conn, addr = self.s.accept()
+            print(self.conn,addr)
             self.encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
         else:
             times = 0
