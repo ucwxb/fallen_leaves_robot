@@ -34,7 +34,6 @@ class UDP_Manager:
     def Start(self):
         self.sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  #UDP协议
         if self.isServer:
-            print(self.addr)
             self.sockUDP.bind(self.addr)
             self.targetDict = {}
             self.targetDict[(self.ip, self.port)] = 1
@@ -67,9 +66,7 @@ class UDP_Manager:
     def Send(self,data):
         for target in self.targetDict.keys():
             if target != self.addr:
-                print(target)
                 target = ('192.168.8.101',8888)
-                print(target)
                 self.sockUDP.sendto(data, target)
 
     def Close(self):
