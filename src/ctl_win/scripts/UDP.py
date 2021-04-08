@@ -66,7 +66,6 @@ class UDP_Manager:
     def Send(self,data):
         for target in self.targetDict.keys():
             if target != self.addr:
-                target = ('192.168.8.101',8888)
                 self.sockUDP.sendto(data, target)
 
     def Close(self):
