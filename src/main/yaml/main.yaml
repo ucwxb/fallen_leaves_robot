@@ -12,17 +12,17 @@ serial_rate: 115200
 x_target: 0
 y_target: 0
 yaw_target: 0
-vel_P: 0.01
+vel_P: 0.05
 vel_I: 0
 vel_D: 0
 w_P: 0
 max_vel: 
-  - 30
-  - 30
+  - 80
+  - 80
   - 1.5
 min_vel:
-  - 15
-  - 15
+  - 30
+  - 30
   - 0.5
 FLR_ip: 192.168.8.101
 FLR_port: 8888
