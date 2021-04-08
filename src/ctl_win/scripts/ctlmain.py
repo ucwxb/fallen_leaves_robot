@@ -15,6 +15,7 @@ from PyQt5.QtCore import Qt,QTimer
 from UDP import UDP_Manager
 # from sensor_msgs.msg import Image
 import numpy as np
+import cv2
 class Ui_CtlWin(object):
 
     def __init__(self, CtlWin):
@@ -97,11 +98,20 @@ class Ui_CtlWin(object):
         self.timer.timeout.connect(self.update_text)
         self.timer.start(200)
 
+        self.pic_timer = QTimer()
+        self.pic_timer.timeout.connect(self.update_pic)
+        self.pic_timer.start(50)
+
         self.lock = False
         self.frame = np.zeros((640,480))
         # self.my_tcp = tcp(is_sender=False)
         self.udp = UDP_Manager(self.cb_leaf_image)
         self.udp.Start()
+        self.FLR_ip = rospy.get_param("/FLR_ip")
+        self.FLR_port = rospy.get_param("/FLR_port")
+        self.udp.targetDict[(self.FLR_ip,self.FLR_port)] = 1
+        self.udp.Send(b'req')
+        
         # self.bridge = CvBridge()
         # rospy.Subscriber("/leaf_image", Image,self.cb_leaf_image)
 
@@ -109,7 +119,7 @@ class Ui_CtlWin(object):
     def cb_leaf_image(self,recvData, recvAddr):
         if self.lock == False: 
             data = np.frombuffer(recvData, dtype=np.uint8)
-            self.frame = cv2.imdecode(data, cv2.IMREAD_COLOR)
+            self.frame = cv2.imdecode(data, cv2.IMWRITE_JPEG_QUALITY)
             # self.frame = self.bridge.imgmsg_to_cv2(img_msg, 'bgr8')
             self.lock = True
 
@@ -280,16 +290,16 @@ class Ui_CtlWin(object):
         self._vel[2] = msg.yaw
 
     def update_pic(self):
+        if self.lock == True:
         # self.cb_leaf_image()
-        img_rows,img_cols,channels = self.frame.shape
-        bytesPerLine = channels * img_cols
-        # cv2.cvtColor(self.frame,cv2.COLOR_BGR2RGB,self.frame)
-        QImg = QImage(self.frame.data,img_cols,img_rows,bytesPerLine,QImage.Format_RGB888)
-        self.show_label.setStyleSheet('background-color: rgb(0, 0, 0)')
-        self.show_label.setPixmap(QPixmap.fromImage(QImg).scaled(
-            self.show_label.size(),Qt.KeepAspectRatio,Qt.SmoothTransformation
-        ))
-        self.lock = False
+            img_rows,img_cols,channels = self.frame.shape
+            bytesPerLine = channels * img_cols
+            QImg = QImage(self.frame.data,img_cols,img_rows,bytesPerLine,QImage.Format_BGR888)
+            self.show_label.setStyleSheet('background-color: rgb(0, 0, 0)')
+            self.show_label.setPixmap(QPixmap.fromImage(QImg).scaled(
+                self.show_label.size(),Qt.KeepAspectRatio,Qt.SmoothTransformation
+            ))
+            self.lock = False
 
     def setupUi(self, CtlWin):
         CtlWin.setObjectName("CtlWin")

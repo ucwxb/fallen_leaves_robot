@@ -58,12 +58,12 @@ class VisionNode:
         self.errImg[:,440:640] = [255, 0, 0]
         self.errImgData = cv2.imencode('.jpg', self.errImg, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
 
-        self.udp  = UDP_Manager(self.rev_data_cb,isServer=True)
+        self.udp  = UDP_Manager(self.rev_data_cb)
         self.udp.Start()
         # print("TCP is ready")
     
     def rev_data_cb(self,recvData, recvAddr):
-        print(recvData,recvAddr)
+        return
         
     def leaf_detect_func(self):
         _,self.frame = self.cap.read()
@@ -99,13 +99,10 @@ class VisionNode:
             leaf_detect_res.res = []
         
         data = cv2.imencode('.jpg', self.frame, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
-
         if len(data) < 64000:
-            target = ('192.168.8.100',8888)
-            self.udp.Send(b'123',target)
-            self.udp.Send(data,('192.168.8.100',8888))
+            self.udp.Send(data)
         else:
-            self.udp.Send(self.errImgData,('192.168.8.100',8888))
+            self.udp.Send(self.errImgData)
         
         # img_msg = self.bridge.cv2_to_imgmsg(self.frame, 'rgb8')
         # self.leaf_image_topic.publish(img_msg)
@@ -119,6 +116,7 @@ class VisionNode:
         while not rospy.is_shutdown():
             self.rate.sleep()
             self.leaf_detect_func()
+        self.udp.Close()
             #self.leaf_detect_src()
             
 if __name__ == '__main__':

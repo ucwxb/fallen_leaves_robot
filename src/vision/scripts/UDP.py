@@ -5,7 +5,7 @@ import threading
 
 
 class UDP_Manager:
-    def __init__(self, callback, buffSize = 64 * 1024, isServer = False, port = 8888, frequency = 50):
+    def __init__(self, callback, buffSize = 64 * 1024, isServer = True, port = 8888, frequency = 50):
         self.callback = callback
         self.buffSize = buffSize
         self.isServer = isServer
@@ -33,6 +33,8 @@ class UDP_Manager:
         self.sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  #UDP协议
         if self.isServer:
             self.sockUDP.bind(self.addr)
+            self.targetDict = {}
+            self.targetDict[(self.ip, self.port)] = 1
             self.roleName = 'Server'
         else:
             self.roleName = 'Client'
@@ -54,10 +56,15 @@ class UDP_Manager:
                     break
                 if not recvData:
                     break
+                if self.targetDict.get(recvAddr) == None:
+                    self.targetDict[recvAddr] = 1
+                    print('monitor {} connected.'.format(recvAddr))
                 self.callback(recvData, recvAddr)
             
-    def Send(self, data, addr):
-        self.sockUDP.sendto(data, addr)
+    def Send(self,data):
+        for target in self.targetDict.keys():
+            if target != self.addr:
+                self.sockUDP.sendto(data, target)
 
     def Close(self):
         self.running = False
