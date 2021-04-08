@@ -292,7 +292,10 @@ class Ui_CtlWin(object):
     def update_pic(self):
         if self.lock == True:
         # self.cb_leaf_image()
-            img_rows,img_cols,channels = self.frame.shape
+            try:
+                img_rows,img_cols,channels = self.frame.shape
+            except:
+                return
             bytesPerLine = channels * img_cols
             QImg = QImage(self.frame.data,img_cols,img_rows,bytesPerLine,QImage.Format_BGR888)
             self.show_label.setStyleSheet('background-color: rgb(0, 0, 0)')

@@ -2,7 +2,7 @@ import socket
 import time
 import struct
 import threading
-
+import rospy
 
 class UDP_Manager:
     def __init__(self, callback, buffSize = 64 * 1024, isServer = True, port = 8888, frequency = 50):
@@ -21,7 +21,9 @@ class UDP_Manager:
         #查询本机ip地址
         try:
             s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-            s.connect(('127.0.0.1',8888))
+            self.FLR_ip = rospy.get_param("/FLR_ip")
+            self.FLR_port = rospy.get_param("/FLR_port")
+            s.connect((self.FLR_ip,self.FLR_port))
             self.ip = s.getsockname()[0]
         except:
             print('No Internet')
@@ -32,6 +34,7 @@ class UDP_Manager:
     def Start(self):
         self.sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  #UDP协议
         if self.isServer:
+            print(self.addr)
             self.sockUDP.bind(self.addr)
             self.targetDict = {}
             self.targetDict[(self.ip, self.port)] = 1
@@ -64,6 +67,9 @@ class UDP_Manager:
     def Send(self,data):
         for target in self.targetDict.keys():
             if target != self.addr:
+                print(target)
+                target = ('192.168.8.101',8888)
+                print(target)
                 self.sockUDP.sendto(data, target)
 
     def Close(self):
