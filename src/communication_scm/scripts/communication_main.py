@@ -36,7 +36,7 @@ class Com:
         times = 0
         while(1):
             try:
-                if times >= 1:
+                if times >= 2:
                     print("failed to connect to stm32")
                     self.ser = None
                     break
