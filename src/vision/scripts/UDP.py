@@ -70,6 +70,9 @@ class UDP_Manager:
 
     def Close(self):
         self.running = False
+        self.sockUDP.shutdown(socket.SHUT_WR)
+        self.sockUDP.close()
+        
         
 
 if __name__ == '__main__':

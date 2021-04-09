@@ -26,22 +26,11 @@ class VisionNode:
 
         self.yolov5Module = detectImage(os.path.join(self.packagePath, self.ptPath))  #加载模型
         self.leaf_detect_topic = rospy.Publisher("/leaf_detect",leaf_detect_msg,queue_size=1)
-        # rospy.Service('/vision_service',leaf_detect_srv, self.leaf_detect_src_callback)  #建立服务
-
-        self.cameraInfo = CameraTrans((640, 480), (0.5, 0.4))  #相机位置信息
-        cameraX_robot      = rospy.get_param('/camera_relativeLocation/x')
-        cameraY_robot      = rospy.get_param('/camera_relativeLocation/y')
-        cameraZ_robot      = rospy.get_param('/camera_relativeLocation/z')
-        cameraYaw_robot    = rospy.get_param('/camera_relativeLocation/yaw')
-        cameraPitch_robot  = rospy.get_param('/camera_relativeLocation/pitch')
-        self.cameraInfo.SetLocation(cameraX_robot, cameraY_robot, cameraZ_robot,
-                                    cameraYaw_robot, cameraPitch_robot)           #相机和激光雷达在机器人坐标系下使用
 
         self.cap = cv2.VideoCapture(rospy.get_param("/cam_index"))
         
         self.frame = np.zeros((640,480))
 
-        self.index_img = 1
 
         # self.bridge = CvBridge()
         # self.leaf_image_topic = rospy.Publisher("/leaf_image", Image,queue_size=1)
@@ -67,6 +56,7 @@ class VisionNode:
         
     def leaf_detect_func(self):
         _,self.frame = self.cap.read()
+        # cv2.flip(self.frame,0)  #翻转
         try:
             detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         except:
@@ -81,19 +71,10 @@ class VisionNode:
                 *xywh, conf, class_index = each_leaf
                 new_leaf_msg.class_index = int(class_index)
                 new_leaf_msg.conf = conf
-                # global_x,global_y,global_z = self.cameraInfo.img2global(xywh[0],xywh[1])
-                # new_leaf_msg.x = global_x
-                # new_leaf_msg.y = global_y
-                # new_leaf_msg.z = global_z
                 new_leaf_msg.x = 480.0-xywh[1]
                 new_leaf_msg.y = xywh[0] - 320.0
                 new_leaf_msg.z = 0
                 leaf_detect_res.res.append(new_leaf_msg)
-
-
-
-            # self.my_tcp.SendImg(self.frame)
-            cv2.imwrite("%d.jpg"%self.index_img,self.frame)
         else:
             leaf_detect_res.isFind = 0
             leaf_detect_res.res = []
@@ -103,9 +84,6 @@ class VisionNode:
             self.udp.Send(data)
         else:
             self.udp.Send(self.errImgData)
-        
-        # img_msg = self.bridge.cv2_to_imgmsg(self.frame, 'rgb8')
-        # self.leaf_image_topic.publish(img_msg)
         self.leaf_detect_topic.publish(leaf_detect_res)
         # cv2.imshow("win",self.frame)
         # if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -113,10 +91,10 @@ class VisionNode:
 
         
     def MainLoop(self):
+        rospy.on_shutdown(self.udp.Close)
         while not rospy.is_shutdown():
             self.rate.sleep()
             self.leaf_detect_func()
-        self.udp.Close()
             #self.leaf_detect_src()
             
 if __name__ == '__main__':

@@ -11,11 +11,8 @@ class ArmCon:
         self.rate = rospy.Rate(20)
         self.Arm = Arm_Device()
         time.sleep(.1)
-        angle1=[]
-        angle2=[]
-        angle3=[]
-        angle4=[]
-        self.angle_list = [angle1,angle2,angle3,angle4]
+        # self.angle_list = [angle1,angle2,angle3,angle4]
+        self.angle_list = rospy.get_param("/angle_list")
         self.current_angle = [0,0,0,0,0,0]
         rospy.Subscriber("/servo_angle_control_topic",UInt32,self.servo_angle_control_topic_cb)
         rospy.Subscriber("/manual",manual,self.servo_manual_control_topic_cb)

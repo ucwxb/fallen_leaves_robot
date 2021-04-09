@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #coding:utf-8
 import serial
-import Jetson.GPIO
+# import Jetson.GPIO
 import time
 import threading
 import rospy
@@ -19,16 +19,13 @@ class Com:
 
         self.rate = rospy.Rate(20)
 
-        rospy.Subscriber("/send_stm32",String,self.send_stm32_cb)
         self.receive_stm32 = rospy.Publisher("/receive_stm32", String,queue_size=1)
-
-        rospy.Subscriber("/send_plc",String,self.send_plc_cb)
         self.receive_plc = rospy.Publisher("/receive_plc", String,queue_size=1)
 
         rospy.Subscriber("/send_stm32_vel",stm_vel_cmd,self.send_stm32_vel)
         rospy.Subscriber("/send_stm32_fan",stm_fan_cmd,self.send_stm32_fan)
         rospy.Subscriber("/send_stm32_brush",stm_brush_cmd,self.send_stm32_brush)
-        rospy.Subscriber("/send_plc_cmd",plc_cmd,self.send_plc_cmd)
+        rospy.Subscriber("/send_plc_cmd",plc_plate_cmd,self.send_plc_cmd)
 
         self.init_serial()
     
@@ -61,20 +58,12 @@ class Com:
                 times += 1
                 print("plc serial time out")
             time.sleep(1)
-    
-    def init_threading(self):
-        self.t = threading.Thread(target=self.receive_stm32_func)
-        # self.t.start()
-        self.plc_t = threading.Thread(target=self.receive_plc_func)
-        # self.plc_t.start()
-
-    def send_stm32_cb(self,msg):
-        data = msg.data
-        self.send_stm32(data)
 
     def send_stm32(self,string):
-        if self.ser != None:
+        try:
             self.ser.write(string)
+        except:
+            return
 
     def receive_stm32_func(self):
         if self.ser != None and self.ser.isOpen():
@@ -92,7 +81,6 @@ class Com:
         vel_x = struct.pack('f',vel_x)
         vel_y = struct.pack('f',vel_y)
         vel_yaw = struct.pack('f',vel_yaw)
-        # print(vel_x,vel_y,vel_yaw)
         cmd_string = b''
         cmd_string += bytes([0xFF])
         cmd_string += bytes([msg_type])
@@ -102,7 +90,6 @@ class Com:
             cmd_string += bytes([i])
         for i in vel_yaw:
             cmd_string += bytes([i])
-        # print(cmd_string)
         self.send_stm32(cmd_string)
     
     def send_stm32_fan(self,msg):
@@ -125,16 +112,13 @@ class Com:
         cmd_string += bytes([msg_type])
         for i in vel:
             cmd_string += bytes([i])
-        # print(cmd_string)
         self.send_stm32(cmd_string)
-
-    def send_plc_cb(self,msg):
-        data = msg.data
-        self.send_plc(data)
     
     def send_plc(self,string):
-        if self.plc_ser != None:
+        try:
             self.plc_ser.write(string)
+        except:
+            return
     
     def receive_plc_func(self):
         if self.plc_ser != None and self.plc_ser.isOpen():
@@ -146,10 +130,6 @@ class Com:
     def send_plc_cmd(self,msg):
         cmd_slisde_dis = msg.slide_dis
         cmd_arm_dis = msg.arm_dis
-        if np.fabs(cmd_slisde_dis)>250:
-            cmd_slisde_dis = 0
-        if np.fabs(cmd_arm_dis)>250:
-            cmd_arm_dis = 0
         cmd_string = "%d %d"%(cmd_slisde_dis,cmd_arm_dis)
         cmd_string = bytes(cmd_string,encoding="utf8")
         self.send_plc(cmd_string)

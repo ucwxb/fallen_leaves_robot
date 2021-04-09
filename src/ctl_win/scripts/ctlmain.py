@@ -39,12 +39,16 @@ class Ui_CtlWin(QMainWindow):
         self.servo_angle = [0,0,0,0,0,0]
         self._servo_angle = [0,0,0,0,0,0]
 
-        self.send_stm32_vel_topic = rospy.Publisher('/send_stm32_vel', stm_vel_cmd, queue_size=1)
+        self.arm_num = 0
+
+        # self.send_stm32_vel_topic = rospy.Publisher('/send_stm32_vel', stm_vel_cmd, queue_size=1)
+        self.send_stm32_vel_topic = rospy.Publisher('/manual_send_stm32_vel', stm_vel_cmd, queue_size=1)
         self.send_brush_topic = rospy.Publisher('/send_stm32_brush', stm_brush_cmd,queue_size=1)
         self.send_fan_topic = rospy.Publisher('/send_stm32_fan', stm_fan_cmd,queue_size=1)
-        self.send_plate_topic  = rospy.Publisher('/send_plc_cmd',plc_cmd , queue_size=1)
+        self.send_plate_topic  = rospy.Publisher('/send_plc_cmd',plc_plate_cmd , queue_size=1)
         self.send_servo_topic = rospy.Publisher('/manual', manual, queue_size=1)
         self.switch_mode_topic = rospy.Publisher('/switch_mode', UInt32, queue_size=1)
+        self.servo_angle_control_topic = rospy.Publisher('/servo_angle_control_topic', UInt32, queue_size=1)
 
         rospy.Subscriber('/send_stm32_vel', stm_vel_cmd, self.display_vel)
         rospy.Subscriber('/read_servo_angle_topic', Int32MultiArray, self.display_servo_angle)
@@ -80,6 +84,10 @@ class Ui_CtlWin(QMainWindow):
         self.servo4_minus_but.clicked.connect(self.servo4_minus_but_func)
         self.servo5_minus_but.clicked.connect(self.servo5_minus_but_func)
         self.servo6_minus_but.clicked.connect(self.servo6_minus_but_func)
+
+        self.arm_num_add.clicked.connect(self.arm_num_add_func)
+        self.arm_num_minus.clicked.connect(self.arm_num_minus_func)
+        self.arm_num_but.clicked.connect(self.arm_num_but_func)
 
         self.send_stm32_vel.clicked.connect(self.send_stm32_vel_func)
         self.stop.clicked.connect(self.stop_func)
@@ -219,6 +227,9 @@ class Ui_CtlWin(QMainWindow):
         info.angle5 = self.servo_angle[4]
         info.angle6 = self.servo_angle[5]
         self.send_servo_topic.publish(info)
+    
+    def arm_num_but_func(self):
+        self.servo_angle_control_topic.publish(self.arm_num)
 
 
 
@@ -284,6 +295,12 @@ class Ui_CtlWin(QMainWindow):
         self.servo_angle[4] -= self.add_val
     def servo6_minus_but_func(self):
         self.servo_angle[5] -= self.add_val
+
+    def arm_num_add_func(self):
+        self.arm_num += 1
+    
+    def arm_num_minus_func(self):
+        self.arm_num -= 1
 
     def display_servo_angle(self,msg):
         servo_angle = msg.data
@@ -562,7 +579,7 @@ class Ui_CtlWin(QMainWindow):
         self.servo6_minus_but.setFont(font)
         self.servo6_minus_but.setObjectName("servo6_minus_but")
         self.send_arm = QtWidgets.QPushButton(self.centralwidget)
-        self.send_arm.setGeometry(QtCore.QRect(350, 440, 91, 51))
+        self.send_arm.setGeometry(QtCore.QRect(350, 410, 91, 81))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.send_arm.setFont(font)
@@ -656,6 +673,30 @@ class Ui_CtlWin(QMainWindow):
         font.setPointSize(20)
         self.change_vel.setFont(font)
         self.change_vel.setObjectName("change_vel")
+        self.arm_num_text = QtWidgets.QTextEdit(self.centralwidget)
+        self.arm_num_text.setGeometry(QtCore.QRect(510, 560, 71, 41))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        self.arm_num_text.setFont(font)
+        self.arm_num_text.setObjectName("arm_num_text")
+        self.arm_num_add = QtWidgets.QPushButton(self.centralwidget)
+        self.arm_num_add.setGeometry(QtCore.QRect(480, 600, 61, 41))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.arm_num_add.setFont(font)
+        self.arm_num_add.setObjectName("arm_num_add")
+        self.arm_num_minus = QtWidgets.QPushButton(self.centralwidget)
+        self.arm_num_minus.setGeometry(QtCore.QRect(540, 600, 61, 41))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.arm_num_minus.setFont(font)
+        self.arm_num_minus.setObjectName("arm_num_minus")
+        self.arm_num_but = QtWidgets.QPushButton(self.centralwidget)
+        self.arm_num_but.setGeometry(QtCore.QRect(630, 580, 91, 51))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.arm_num_but.setFont(font)
+        self.arm_num_but.setObjectName("arm_num_but")
         CtlWin.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(CtlWin)
         self.statusbar.setObjectName("statusbar")
@@ -811,6 +852,14 @@ class Ui_CtlWin(QMainWindow):
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:15pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.change_vel.setText(_translate("CtlWin", "x1"))
+        self.arm_num_text.setHtml(_translate("CtlWin", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:15pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+        self.arm_num_add.setText(_translate("CtlWin", "增"))
+        self.arm_num_minus.setText(_translate("CtlWin", "减"))
+        self.arm_num_but.setText(_translate("CtlWin", "机械臂"))
 
 def main():
     app = QApplication(sys.argv) # sys.argv即命令行参数

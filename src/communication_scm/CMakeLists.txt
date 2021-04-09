@@ -50,7 +50,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  plc_cmd.msg
+  plc_plate_cmd.msg
   stm_vel_cmd.msg
   stm_fan_cmd.msg
   stm_brush_cmd.msg
