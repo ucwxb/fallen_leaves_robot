@@ -8,7 +8,7 @@ from PyQt5.QtGui import QImage
 import rospy
 from communication_scm.msg import *
 from arm_control.msg import * 
-from std_msgs.msg import UInt32,UInt32MultiArray,Int32MultiArray,Empty
+from std_msgs.msg import UInt32,Int32,UInt32MultiArray,Int32MultiArray,Empty
 from PyQt5.QtCore import Qt,QTimer
 # from cv_bridge import CvBridge
 # from TCP import tcp
@@ -47,7 +47,7 @@ class Ui_CtlWin(QMainWindow):
         self.send_fan_topic = rospy.Publisher('/send_stm32_fan', stm_fan_cmd,queue_size=1)
         self.send_plate_topic  = rospy.Publisher('/send_plc_cmd',plc_plate_cmd , queue_size=1)
         self.send_servo_topic = rospy.Publisher('/manual', manual, queue_size=1)
-        self.switch_mode_topic = rospy.Publisher('/switch_mode', UInt32, queue_size=1)
+        self.switch_mode_topic = rospy.Publisher('/switch_mode', Int32, queue_size=1)
         self.servo_angle_control_topic = rospy.Publisher('/servo_angle_control_topic', UInt32, queue_size=1)
 
         rospy.Subscriber('/send_stm32_vel', stm_vel_cmd, self.display_vel)
@@ -179,7 +179,7 @@ class Ui_CtlWin(QMainWindow):
         
         self.run_mode_index+=1
         self.run_mode_index%=len(self.run_mode)
-        self.switch_mode_topic.publish(self.run_mode_index)
+        self.switch_mode_topic.publish(int(self.run_mode_index))
         self.stop.setText(self.run_mode[self.run_mode_index])
 
     def send_front_plate_func(self):

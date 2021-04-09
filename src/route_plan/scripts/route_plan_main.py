@@ -3,7 +3,7 @@
 import rospy
 import os
 from vision.msg import leaf_msg,leaf_detect_msg
-from std_msgs.msg import Empty,UInt32
+from std_msgs.msg import Empty,UInt32,Int32
 from PID import PID
 from communication_scm.msg import *
 import numpy as np
@@ -18,7 +18,7 @@ class RoutePlanNode:
         rospy.Subscriber("/leaf_detect",leaf_detect_msg,self.leaf_detect_cb)
 
         self.current_mode = 0
-        rospy.Subscriber("/switch_mode",UInt32,self.switch_mode_cb)
+        rospy.Subscriber("/switch_mode",Int32,self.switch_mode_cb)
 
         self.is_handle = 0
 
