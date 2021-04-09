@@ -35,7 +35,8 @@ class ArmCon:
                 self.ctrl_all_servo(self.chazhi_angle,s_time=500)
 
         else:
-            self.chazhi_angle=self.angle_list[m].copy()
+            self.chazhi_angle=self.angle_list[m-1].copy()
+            self.chazhi_angle[5]=180
             for num in range(0,6):
                 for i in range(0,5):
                     self.chazhi_angle[i]=self.chazhi_angle[i]+(self.angle_list[m][i]-self.angle_list[m-1][i])/6
