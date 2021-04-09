@@ -39,7 +39,7 @@ class RoutePlanNode:
         self._stm_vel.yaw = msg.yaw
 
     def switch_mode_cb(self,msg):
-        self.current_mode = msg.data
+        self.current_mode = int(msg.data)
 
     def get_leaf_pos(self,res):
         distance = []
@@ -64,6 +64,7 @@ class RoutePlanNode:
         self.is_handle = 0
 
     def leaf_detect_cb(self,msg):
+        print(self.current_mode)
         if self.current_mode == 1:
             if msg.isFind == 1:
                 
