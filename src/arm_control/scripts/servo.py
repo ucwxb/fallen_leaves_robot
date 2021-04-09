@@ -25,8 +25,7 @@ class ArmCon:
         self.Arm.Arm_serial_servo_write6(angle[0], angle[1], angle[2], angle[3], angle[4], angle[5], s_time)
         time.sleep(s_time/1000)
 
-    def  arm_chazhi(self,n,m)
-    
+    def  arm_chazhi(self,n,m):
         if n==0:
             self.chazhi_angle=self.initial_angle.copy()
             for num in range(0,6):
@@ -35,7 +34,7 @@ class ArmCon:
                 print(self.chazhi_angle)
                 self.ctrl_all_servo(self.chazhi,s_time=500)
 
-        elif:
+        else:
             self.chazhi_angle=self.angle_list[m].copy()
             for num in range(0,6):
                 for i in range(0,5):
