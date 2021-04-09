@@ -48,17 +48,17 @@ class ArmCon:
         self.initial_angle=self.current_angle.copy()
         if Number==1:
             self.arm_chazhi(0,0)
-            self.Arm_serial_servo_write(6,180,500)
+            self.Arm.Arm_serial_servo_write(6,180,500)
             time.sleep(.1)
             self.arm_chazhi(1,1)
-            self.Arm_serial_servo_write(6,35,500)
+            self.Arm.Arm_serial_servo_write(6,35,500)
 
         if Number==2:
             self.arm_chazhi(0,2)
-            self.Arm_serial_servo_write(6,180,500)
+            self.Arm.Arm_serial_servo_write(6,180,500)
             time.sleep(.1)
             self.arm_chazhi(1,3)
-            self.Arm_serial_servo_write(6,35,500)
+            self.Arm.Arm_serial_servo_write(6,35,500)
 
 
 
