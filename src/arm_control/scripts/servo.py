@@ -32,7 +32,7 @@ class ArmCon:
                 for i in range(0,6):
                     self.chazhi_angle[i]=self.chazhi_angle[i]+(self.angle_list[m][i]-self.initial_angle[i])/6
                 print(self.chazhi_angle)
-                self.ctrl_all_servo(self.chazhi,s_time=500)
+                self.ctrl_all_servo(self.chazhi_angle,s_time=500)
 
         else:
             self.chazhi_angle=self.angle_list[m].copy()
@@ -40,7 +40,7 @@ class ArmCon:
                 for i in range(0,5):
                     self.chazhi_angle[i]=self.chazhi_angle[i]+(self.angle_list[m][i]-self.angle_list[m-1][i])/6
                 print(self.chazhi_angle)
-                self.ctrl_all_servo(self.chazhi,s_time=500)
+                self.ctrl_all_servo(self.chazhi_angle,s_time=500)
 
 
     def servo_angle_control_topic_cb(self,msg):
