@@ -8,6 +8,11 @@ from PID import PID
 from communication_scm.msg import *
 import numpy as np
 from sensor_msgs.msg import LaserScan
+class Point:
+    def __init__(self,dis,angle,index):
+        self.dis = dis
+        self.angle = angle
+        self.index = index
 class RoutePlanNode:
     def __init__(self):
     
