@@ -3,13 +3,11 @@
 import rospy
 import os
 from vision.msg import leaf_msg,leaf_detect_msg
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty,UInt32
 from PID import PID
 from communication_scm.msg import stm_vel_cmd
 import numpy as np
-STOP = 0
-RUN = 1
-MODE = [STOP,RUN]
+
 class RoutePlanNode:
     def __init__(self):
     
@@ -19,14 +17,14 @@ class RoutePlanNode:
         self.packagePath = rospy.get_param("/pkg_path/route_plan")
         self.pid = PID()
         rospy.Subscriber("/leaf_detect",leaf_detect_msg,self.leaf_detect_cb)
-        self.current_mode = RUN
-        rospy.Subscriber("/switch_mode",Empty,self.switch_mode_cb)
+        self.current_mode = 0
+        rospy.Subscriber("/switch_mode",UInt32,self.switch_mode_cb)
+        self.run_mode = ["暂停","自动","遥控"]
         self.send_stm32_vel = rospy.Publisher("/send_stm32_vel",stm_vel_cmd,queue_size=1)
         self.is_handle = 0
     
-    def switch_mode_cb(self):
-        self.current_mode += 1
-        self.current_mode %= len(MODE)
+    def switch_mode_cb(self,msg):
+        self.current_mode = msg.data
 
     def get_leaf_pos(self,res):
         distance = []
@@ -37,7 +35,7 @@ class RoutePlanNode:
 
     def leaf_detect_cb(self,msg):
         stm_vel = stm_vel_cmd()
-        if self.is_handle == 0 and msg.isFind == 1 and self.current_mode == RUN:
+        if self.is_handle == 0 and msg.isFind == 1 and self.current_mode == 1:
             self.is_handle = 1
             leafPos = self.get_leaf_pos(msg.res)
             res = self.pid.VelPIDController(leafPos)

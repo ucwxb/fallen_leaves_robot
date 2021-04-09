@@ -16,10 +16,11 @@ from UDP import UDP_Manager
 # from sensor_msgs.msg import Image
 import numpy as np
 import cv2
-class Ui_CtlWin(object):
+class Ui_CtlWin(QMainWindow):
 
-    def __init__(self, CtlWin):
-        self.setupUi(CtlWin)
+    def __init__(self):
+        super(Ui_CtlWin, self).__init__()
+        self.setupUi(self)
         self.init_ctl()
 
     def init_ctl(self):
@@ -43,7 +44,7 @@ class Ui_CtlWin(object):
         self.send_fan_topic = rospy.Publisher('/send_stm32_fan', stm_fan_cmd,queue_size=1)
         self.send_plate_topic  = rospy.Publisher('/send_plc_cmd',plc_cmd , queue_size=1)
         self.send_servo_topic = rospy.Publisher('/manual', manual, queue_size=1)
-        self.switch_mode_topic = rospy.Publisher('/switch_mode', Empty, queue_size=1)
+        self.switch_mode_topic = rospy.Publisher('/switch_mode', UInt32, queue_size=1)
 
         rospy.Subscriber('/send_stm32_vel', stm_vel_cmd, self.display_vel)
         rospy.Subscriber('/read_servo_angle_topic', Int32MultiArray, self.display_servo_angle)
@@ -82,6 +83,8 @@ class Ui_CtlWin(object):
 
         self.send_stm32_vel.clicked.connect(self.send_stm32_vel_func)
         self.stop.clicked.connect(self.stop_func)
+        self.run_mode = ["暂停","自动","遥控"]
+        self.run_mode_index = 0
         self.send_front_plate.clicked.connect(self.send_front_plate_func)
         self.send_behind_plate.clicked.connect(self.send_behind_plate_func)
         self.send_brush.clicked.connect(self.send_brush_func)
@@ -107,14 +110,13 @@ class Ui_CtlWin(object):
         # self.my_tcp = tcp(is_sender=False)
         self.udp = UDP_Manager(self.cb_leaf_image)
         self.udp.Start()
-        self.FLR_ip = rospy.get_param("/FLR_ip")
-        self.FLR_port = rospy.get_param("/FLR_port")
-        self.udp.targetDict[(self.FLR_ip,self.FLR_port)] = 1
-        self.udp.Send(b'req')
-        
-        # self.bridge = CvBridge()
-        # rospy.Subscriber("/leaf_image", Image,self.cb_leaf_image)
+        # self.FLR_ip = rospy.get_param("/FLR_ip")
+        # self.FLR_port = rospy.get_param("/FLR_port")
+        # self.udp.targetDict[(self.FLR_ip,self.FLR_port)] = 1
+        # self.udp.Send(b'req')
 
+    def closeEvent(self, event):
+        self.udp.Close()
 
     def cb_leaf_image(self,recvData, recvAddr):
         if self.lock == False: 
@@ -166,21 +168,25 @@ class Ui_CtlWin(object):
         self.send_stm32_vel_topic.publish(info)
     
     def stop_func(self):
-        self.switch_mode_topic.publish()
+        
+        self.run_mode_index+=1
+        self.run_mode_index%=len(self.run_mode)
+        self.switch_mode_topic.publish(self.run_mode_index)
+        self.stop.setText(self.run_mode[self.run_mode_index])
+        if self.run_mode[self.run_mode_index] == "暂停":
+            self.vel = [0,0,0]
+            self.send_stm32_vel_func()
 
-        self.vel = [0,0,0]
-        self.send_stm32_vel_func()
+            self.brush = 0
+            self.send_brush_func()
 
-        self.brush = 0
-        self.send_brush_func()
+            self.fan = 0
+            self.send_fan_func()
 
-        self.fan = 0
-        self.send_fan_func()
-
-        self.front_plate = 0
-        self.behind_plate = 0
-        self.send_front_plate_func()
-        self.send_behind_plate_func()
+            self.front_plate = 0
+            self.behind_plate = 0
+            self.send_front_plate_func()
+            self.send_behind_plate_func()
 
     def send_front_plate_func(self):
         info = plc_cmd()
@@ -306,7 +312,7 @@ class Ui_CtlWin(object):
 
     def setupUi(self, CtlWin):
         CtlWin.setObjectName("CtlWin")
-        CtlWin.resize(1120, 720)
+        CtlWin.resize(1118, 717)
         self.centralwidget = QtWidgets.QWidget(CtlWin)
         self.centralwidget.setObjectName("centralwidget")
         self.x_text = QtWidgets.QTextEdit(self.centralwidget)
@@ -406,7 +412,7 @@ class Ui_CtlWin(object):
         self.send_stm32_vel.setFont(font)
         self.send_stm32_vel.setObjectName("send_stm32_vel")
         self.stop = QtWidgets.QPushButton(self.centralwidget)
-        self.stop.setGeometry(QtCore.QRect(360, 570, 81, 61))
+        self.stop.setGeometry(QtCore.QRect(350, 500, 81, 61))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.stop.setFont(font)
@@ -621,11 +627,11 @@ class Ui_CtlWin(object):
         font.setPointSize(15)
         self.brush_text.setFont(font)
         self.brush_text.setObjectName("brush_text")
-        self.show_label = QtWidgets.QLabel(self.centralwidget)
-        self.show_label.setGeometry(QtCore.QRect(450, 10, 640, 480))
-        self.show_label.setText("")
-        self.show_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.show_label.setObjectName("show_label")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(450, 10, 640, 480))
+        self.label.setText("")
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setObjectName("label")
         self.x_text_current = QtWidgets.QTextEdit(self.centralwidget)
         self.x_text_current.setGeometry(QtCore.QRect(20, 10, 71, 41))
         font = QtGui.QFont()
@@ -645,7 +651,7 @@ class Ui_CtlWin(object):
         self.yaw_text_current.setFont(font)
         self.yaw_text_current.setObjectName("yaw_text_current")
         self.change_vel = QtWidgets.QPushButton(self.centralwidget)
-        self.change_vel.setGeometry(QtCore.QRect(380, 610, 81, 61))
+        self.change_vel.setGeometry(QtCore.QRect(350, 570, 81, 61))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.change_vel.setFont(font)
@@ -808,10 +814,12 @@ class Ui_CtlWin(object):
 
 def main():
     app = QApplication(sys.argv) # sys.argv即命令行参数
-    mainWindow = QMainWindow()
-    mainWidget = Ui_CtlWin(mainWindow) #新建一个主界面
+    # mainWindow = QMainWindow()
+    # mainWidget = Ui_CtlWin(mainWindow) #新建一个主界面
+    mainWindow = Ui_CtlWin() #新建一个主界面
     mainWindow.show()	#显示主界面
     exit(app.exec_()) #进入消息循环
 
 if __name__ == '__main__':
     main()
+    print("tuichu")
