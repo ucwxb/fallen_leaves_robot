@@ -3,7 +3,7 @@
 import rospy
 import os
 from vision.msg import leaf_msg,leaf_detect_msg
-from std_msgs.msg import Empty,UInt32
+from std_msgs.msg import Empty,UInt32,Int32
 from PID import PID
 from communication_scm.msg import *
 import numpy as np
@@ -18,7 +18,7 @@ class RoutePlanNode:
         rospy.Subscriber("/leaf_detect",leaf_detect_msg,self.leaf_detect_cb)
 
         self.current_mode = 0
-        rospy.Subscriber("/switch_mode",UInt32,self.switch_mode_cb)
+        rospy.Subscriber("/switch_mode",Int32,self.switch_mode_cb)
 
         self.is_handle = 0
 
@@ -64,19 +64,18 @@ class RoutePlanNode:
         self.is_handle = 0
 
     def leaf_detect_cb(self,msg):
-        if self.current_mode == 1:
-            if msg.isFind == 1:
-                
-                leafPos = self.get_leaf_pos(msg.res)
-                res = self.pid.VelPIDController(leafPos)
-                self.stm_vel.x = res[0]
-                self.stm_vel.y = res[1]
-                self.stm_vel.yaw = res[2]
-                
-            else:
-                self.stm_vel.x = 0
-                self.stm_vel.y = 0
-                self.stm_vel.yaw = 0
+        if msg.isFind == 1:
+            
+            leafPos = self.get_leaf_pos(msg.res)
+            res = self.pid.VelPIDController(leafPos)
+            self.stm_vel.x = res[0]
+            self.stm_vel.y = res[1]
+            self.stm_vel.yaw = res[2]
+            
+        else:
+            self.stm_vel.x = 0
+            self.stm_vel.y = 0
+            self.stm_vel.yaw = 0
         
     def MainLoop(self):
         while not rospy.is_shutdown():

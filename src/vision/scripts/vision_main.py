@@ -56,7 +56,8 @@ class VisionNode:
         
     def leaf_detect_func(self):
         _,self.frame = self.cap.read()
-        # cv2.flip(self.frame,0)  #翻转
+        self.frame = cv2.flip(self.frame,0)  #翻转
+        self.frame = cv2.flip(self.frame,1)  #翻转
         try:
             detect_res,self.frame = self.yolov5Module.detect(self.frame)  #画box
         except:
