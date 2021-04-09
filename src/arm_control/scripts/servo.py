@@ -20,7 +20,7 @@ class ArmCon:
         rospy.Subscriber("/manual",manual,self.servo_manual_control_topic_cb)
         self.read_servo_angle_topic = rospy.Publisher("/read_servo_angle_topic",Int32MultiArray,queue_size=1)
     
-    def ctrl_all_servo(self,angle, s_time = 500):
+    def ctrl_all_servo(self,angle, s_time):
         print(123)
         self.Arm.Arm_serial_servo_write6(angle[0], angle[1], angle[2], angle[3], angle[4], angle[5], s_time)
         time.sleep(s_time/1000)
@@ -41,7 +41,7 @@ class ArmCon:
                 for i in range(0,5):
                     self.chazhi_angle[i]=self.chazhi_angle[i]+(self.angle_list[m][i]-self.angle_list[m-1][i])/20
                 print(self.chazhi_angle)
-                self.ctrl_all_servo(self.chazhi_angle,s_time=500)
+                self.ctrl_all_servo(self.chazhi_angle,s_time=50)
 
 
     def servo_angle_control_topic_cb(self,msg):
