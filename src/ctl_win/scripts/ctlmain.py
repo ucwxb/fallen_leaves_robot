@@ -321,9 +321,9 @@ class Ui_CtlWin(QMainWindow):
                 return
             bytesPerLine = channels * img_cols
             QImg = QImage(self.frame.data,img_cols,img_rows,bytesPerLine,QImage.Format_BGR888)
-            self.show_label.setStyleSheet('background-color: rgb(0, 0, 0)')
-            self.show_label.setPixmap(QPixmap.fromImage(QImg).scaled(
-                self.show_label.size(),Qt.KeepAspectRatio,Qt.SmoothTransformation
+            self.label.setStyleSheet('background-color: rgb(0, 0, 0)')
+            self.label.setPixmap(QPixmap.fromImage(QImg).scaled(
+                self.label.size(),Qt.KeepAspectRatio,Qt.SmoothTransformation
             ))
             self.lock = False
 
