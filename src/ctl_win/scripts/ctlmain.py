@@ -115,13 +115,12 @@ class Ui_CtlWin(QMainWindow):
 
         self.lock = False
         self.frame = np.zeros((640,480))
-        # self.my_tcp = tcp(is_sender=False)
         self.udp = UDP_Manager(self.cb_leaf_image)
         self.udp.Start()
-        # self.FLR_ip = rospy.get_param("/FLR_ip")
-        # self.FLR_port = rospy.get_param("/FLR_port")
-        # self.udp.targetDict[(self.FLR_ip,self.FLR_port)] = 1
-        # self.udp.Send(b'req')
+        self.FLR_ip = rospy.get_param("/FLR_ip")
+        self.FLR_port = rospy.get_param("/FLR_port")
+        self.udp.targetDict[(self.FLR_ip,self.FLR_port)] = 1
+        self.udp.Send(b'req')
 
     def closeEvent(self, event):
         self.udp.Close()
@@ -130,7 +129,6 @@ class Ui_CtlWin(QMainWindow):
         if self.lock == False: 
             data = np.frombuffer(recvData, dtype=np.uint8)
             self.frame = cv2.imdecode(data, cv2.IMWRITE_JPEG_QUALITY)
-            # self.frame = self.bridge.imgmsg_to_cv2(img_msg, 'bgr8')
             self.lock = True
 
     def change_func(self):
