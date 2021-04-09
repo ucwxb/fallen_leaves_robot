@@ -1,5 +1,5 @@
 <launch>
-
+   <rosparam file="$(find main)/yaml/main.yaml" command="load" />
     <node name = "ctl_win_node" pkg = "ctl_win" type="ctlmain.py" output = "screen"/>
 
 </launch>
