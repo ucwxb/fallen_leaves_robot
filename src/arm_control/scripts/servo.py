@@ -37,9 +37,9 @@ class ArmCon:
         else:
             self.chazhi_angle=self.angle_list[m-1].copy()
             self.chazhi_angle[5]=180
-            for num in range(0,6):
+            for num in range(0,20):
                 for i in range(0,5):
-                    self.chazhi_angle[i]=self.chazhi_angle[i]+(self.angle_list[m][i]-self.angle_list[m-1][i])/6
+                    self.chazhi_angle[i]=self.chazhi_angle[i]+(self.angle_list[m][i]-self.angle_list[m-1][i])/20
                 print(self.chazhi_angle)
                 self.ctrl_all_servo(self.chazhi_angle,s_time=500)
 
@@ -49,17 +49,17 @@ class ArmCon:
         self.initial_angle=self.current_angle.copy()
         if Number==1:
             self.arm_chazhi(0,0)
-            self.Arm.Arm_serial_servo_write(6,180,500)
-            time.sleep(.1)
+            self.Arm.Arm_serial_servo_write(6,180,1500)
+            time.sleep(1)
             self.arm_chazhi(1,1)
-            self.Arm.Arm_serial_servo_write(6,35,500)
+            self.Arm.Arm_serial_servo_write(6,35,1500)
 
         if Number==2:
             self.arm_chazhi(0,2)
-            self.Arm.Arm_serial_servo_write(6,180,500)
-            time.sleep(.1)
+            self.Arm.Arm_serial_servo_write(6,180,1500)
+            time.sleep(1)
             self.arm_chazhi(1,3)
-            self.Arm.Arm_serial_servo_write(6,35,500)
+            self.Arm.Arm_serial_servo_write(6,35,1500)
 
 
 
