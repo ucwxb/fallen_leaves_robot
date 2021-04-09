@@ -181,20 +181,6 @@ class Ui_CtlWin(QMainWindow):
         self.run_mode_index%=len(self.run_mode)
         self.switch_mode_topic.publish(self.run_mode_index)
         self.stop.setText(self.run_mode[self.run_mode_index])
-        if self.run_mode[self.run_mode_index] == "暂停":
-            self.vel = [0,0,0]
-            self.send_stm32_vel_func()
-
-            self.brush = 0
-            self.send_brush_func()
-
-            self.fan = 0
-            self.send_fan_func()
-
-            self.front_plate = 0
-            self.behind_plate = 0
-            self.send_front_plate_func()
-            self.send_behind_plate_func()
 
     def send_front_plate_func(self):
         info = plc_cmd()
