@@ -80,6 +80,7 @@ class VisionNode:
             leaf_detect_res.res = []
         
         data = cv2.imencode('.jpg', self.frame, (cv2.IMWRITE_JPEG_QUALITY, self.jpegQuality))[1].tobytes()
+        print(data)
         if len(data) < 64000:
             self.udp.Send(data)
         else:
@@ -91,7 +92,6 @@ class VisionNode:
 
         
     def MainLoop(self):
-        rospy.on_shutdown(self.udp.Close)
         while not rospy.is_shutdown():
             self.rate.sleep()
             self.leaf_detect_func()

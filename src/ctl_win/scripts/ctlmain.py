@@ -167,6 +167,8 @@ class Ui_CtlWin(QMainWindow):
         self.current_servo5_angle.setText(str(self._servo_angle[4]))
         self.current_servo6_angle.setText(str(self._servo_angle[5]))
 
+        self.arm_num_text.setText(str(self.arm_num))
+
 
     def send_stm32_vel_func(self):
         info = stm_vel_cmd()
