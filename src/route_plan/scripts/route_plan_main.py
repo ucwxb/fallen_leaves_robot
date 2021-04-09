@@ -5,7 +5,7 @@ import os
 from vision.msg import leaf_msg,leaf_detect_msg
 from std_msgs.msg import Empty,UInt32
 from PID import PID
-from communication_scm.msg import stm_vel_cmd
+from communication_scm.msg import *
 import numpy as np
 
 class RoutePlanNode:
@@ -19,9 +19,15 @@ class RoutePlanNode:
         rospy.Subscriber("/leaf_detect",leaf_detect_msg,self.leaf_detect_cb)
         self.current_mode = 0
         rospy.Subscriber("/switch_mode",UInt32,self.switch_mode_cb)
-        self.run_mode = ["暂停","自动","遥控"]
         self.send_stm32_vel = rospy.Publisher("/send_stm32_vel",stm_vel_cmd,queue_size=1)
         self.is_handle = 0
+        self.stm_vel = stm_vel_cmd()
+
+        self.brush = 0
+        self.send_brush_topic = rospy.Publisher('/send_stm32_brush', stm_brush_cmd,queue_size=1)
+        self.fan = 0
+        self.send_fan_topic = rospy.Publisher('/send_stm32_fan', stm_fan_cmd,queue_size=1)
+
     
     def switch_mode_cb(self,msg):
         self.current_mode = msg.data
@@ -33,26 +39,38 @@ class RoutePlanNode:
         index = np.argmin(distance)
         return [res[index].x,res[index].y,0]
 
+    def handle_mode(self):
+        self.is_handle = 1
+        if self.current_mode == 1:
+            self.send_stm32_vel.publish(self.stm_vel)
+        elif self.current_mode == 0:
+            stop_vel = stm_vel_cmd()
+            stop_vel.x = 0
+            stop_vel.y = 0
+            stop_vel.yaw = 0
+            self.send_stm32_vel.publish(stop_vel)
+
+        self.is_handle = 0
+        
     def leaf_detect_cb(self,msg):
-        stm_vel = stm_vel_cmd()
-        if self.is_handle == 0 and msg.isFind == 1 and self.current_mode == 1:
-            self.is_handle = 1
+        if msg.isFind == 1:
+            
             leafPos = self.get_leaf_pos(msg.res)
             res = self.pid.VelPIDController(leafPos)
-            stm_vel.x = res[0]
-            stm_vel.y = res[1]
-            stm_vel.yaw = res[2]
-            self.send_stm32_vel.publish(stm_vel)
-            self.is_handle = 0
+            self.stm_vel.x = res[0]
+            self.stm_vel.y = res[1]
+            self.stm_vel.yaw = res[2]
+            
+            
         else:
-            stm_vel.x = 0
-            stm_vel.y = 0
-            stm_vel.yaw = 0
-            self.send_stm32_vel.publish(stm_vel)
+            self.stm_vel.x = 0
+            self.stm_vel.y = 0
+            self.stm_vel.yaw = 0
         
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
+            self.handle_mode()
 
 if __name__ == '__main__':
     node1 = RoutePlanNode()
