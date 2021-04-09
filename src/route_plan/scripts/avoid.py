@@ -15,12 +15,7 @@ class Avoid:
     
         self.rate = rospy.Rate(20)
         rospy.Subscriber("/scan",LaserScan,self.laser_cloud_cb)
-        self.min_dis = 0.1
-        self.max_dis = 6.0
-        self.danger_dis = 1.0
-        self.min_num = 10
-        self.ample = 40
-        self.lock = False
+
     
     def laser_cloud_cb(self,msg):
         if self.lock:
@@ -36,7 +31,6 @@ class Avoid:
                     if flag == 0:
                         temp_list = []
                         flag = 1
-                    # print("angle",val,np.pi-index*angle_increment)
                     temp_list.append(Point(val,np.pi-index*angle_increment,index))
                 else:
                     if flag == 1:
@@ -61,19 +55,8 @@ class Avoid:
             avg /= len(each_list)
             avg = self.danger_dis - avg
             avg_angle /= len(each_list)
-            # print("avg:",avg,"avg_angle:",avg_angle)
             x_vel -= avg*np.cos(avg_angle)
             y_vel -= avg*np.sin(avg_angle)
-            # temp_y = self.danger_dis - np.fabs(avg*np.sin(avg_angle))
-            # if avg*np.cos(avg_angle) > 0:
-            #     x_vel -= temp_x
-            # else:
-            #     x_vel += temp_x
-            
-            # if avg*np.sin(avg_angle) > 0:
-            #     y_vel -= temp_y
-            # else:
-            #     y_vel += temp_y
         
         while np.fabs(x_vel) >= 1.0 :
             x_vel /= 2.0

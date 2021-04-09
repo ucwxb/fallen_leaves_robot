@@ -49,3 +49,9 @@ angle_list:
     - 23
     - 0
     - 180
+avoid:
+ min_dis: 0.1
+ max_dis: 6.0
+ danger_dis: 1.0
+ min_num: 10
+ ample: 40
