@@ -35,7 +35,6 @@ class ArmCon:
         for i in range(self.arm_assert_num):
             for j in range(6):
                 assert_angle[j] += (second_pos[j]-first_pos[j])/self.arm_assert_num
-            print(assert_angle)
             self.ctrl_all_servo(assert_angle)
     
     def new_servo_angle_control_topic_cb(self,msg):
