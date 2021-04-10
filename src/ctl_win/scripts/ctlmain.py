@@ -307,7 +307,7 @@ class Ui_CtlWin(QMainWindow):
         for i in range(6):
             self._servo_angle[i] = servo_angle[i]
         if self.first_time_read_servo:
-            self.servo_angle = self._servo_angle
+            self.servo_angle = self._servo_angle.copy()
             self.first_time_read_servo = 0
     
     def display_vel(self,msg):
