@@ -138,8 +138,8 @@ class Com:
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
-            self.receive_plc_func()
-            self.receive_stm32_func()
+            # self.receive_plc_func()
+            # self.receive_stm32_func()
             
 
 if __name__ == '__main__':
