@@ -134,4 +134,4 @@ ready_to_sweep:
   front_plate: -150
   after_plate: 0
 
-arm_assert_num: 10
+arm_assert_num: 6
