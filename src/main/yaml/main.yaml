@@ -49,6 +49,44 @@ angle_list:
     - 23
     - 0
     - 180
+angle_template:
+  -
+    -
+      - 90
+      - 67
+      - 59
+      - 69
+      - 89
+      - 180
+    -
+      - 0
+      - 72
+      - 23
+      - 23
+      - 0
+      - 180
+    -
+      - 0
+      - 72
+      - 23
+      - 23
+      - 0
+      - 35
+  -
+    -
+      - 90
+      - 67
+      - 59
+      - 69
+      - 89
+      - 35
+    -
+      - 0
+      - 72
+      - 23
+      - 23
+      - 0
+      - 180
 avoid:
  min_dis: 0.1
  max_dis: 6.0
@@ -58,5 +96,7 @@ avoid:
 min_sweep_time: 10
 ready_to_sweep:
   brush: 120
-  front_plate: 0
+  front_plate: -150
   after_plate: 0
+
+arm_assert_num: 6

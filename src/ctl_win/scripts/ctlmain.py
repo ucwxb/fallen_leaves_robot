@@ -55,6 +55,7 @@ class Ui_CtlWin(QMainWindow):
         self.send_servo_topic = rospy.Publisher('/manual', manual, queue_size=1)
         self.switch_mode_topic = rospy.Publisher('/switch_mode', Int32, queue_size=1)
         self.servo_angle_control_topic = rospy.Publisher('/servo_angle_control_topic', UInt32, queue_size=1)
+        self.switch_avoid_topic = rospy.Publisher("/switch_avoid",Empty,queue_size=1)
 
         rospy.Subscriber('/send_stm32_vel', stm_vel_cmd, self.display_vel)
         rospy.Subscriber('/read_servo_angle_topic', Int32MultiArray, self.display_servo_angle)
@@ -377,6 +378,8 @@ class Ui_CtlWin(QMainWindow):
             self.is_minus_angle = 0
         elif (event.key() == Qt.Key_Minus):
             self.is_minus_angle = 1
+        elif (event.key() == Qt.Key_P):
+            self.switch_avoid_topic.publish(Empty())
 
     def setupUi(self, CtlWin):
         CtlWin.setObjectName("CtlWin")

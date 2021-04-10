@@ -126,7 +126,7 @@ class RoutePlanNode:
     
     def reset_from_sweep(self):
         self.send_stm32_brush.publish(stm_brush_cmd(0))
-        self.send_plc_cmd.publish(plc_plate_cmd(0,0))
+        self.send_plc_cmd.publish(plc_plate_cmd(-10,100))
 
     def get_leaf_pos(self,res):
         distance = []
