@@ -148,6 +148,7 @@ class RoutePlanNode:
             self.send_stm32_fan.publish(stm_fan_cmd(0))
             self.send_stm32_brush.publish(stm_brush_cmd(0))
             self.send_plc_cmd.publish(plc_plate_cmd(100,100))
+            self.current_mode = -1
         elif self.current_mode == 2:
             self._stm_vel.x += self.x_avoid_vel
             self._stm_vel.y += self.y_avoid_vel
