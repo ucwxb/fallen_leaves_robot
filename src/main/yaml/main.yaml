@@ -57,6 +57,6 @@ avoid:
  ample: 10
 min_sweep_time: 10
 ready_to_sweep:
-  brush: 0
+  brush: 120
   front_plate: 0
   after_plate: 0
