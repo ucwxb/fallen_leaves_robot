@@ -130,6 +130,7 @@ class Com:
     def send_plc_cmd(self,msg):
         cmd_slisde_dis = msg.slide_dis
         cmd_arm_dis = msg.arm_dis
+        cmd_arm_dis = 100
         cmd_string = "%d %d"%(cmd_slisde_dis,cmd_arm_dis)
         cmd_string = bytes(cmd_string,encoding="utf8")
         self.send_plc(cmd_string)
