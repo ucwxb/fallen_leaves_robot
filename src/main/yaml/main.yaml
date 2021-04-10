@@ -57,7 +57,7 @@ angle_template:
       - 80
       - 95
       - 90
-      - 35
+      - 50
     -
       - 100
       - 35
@@ -78,7 +78,7 @@ angle_template:
       - 25
       - 20
       - 180
-      - 35
+      - 50
   -
     -
       - 100
@@ -86,7 +86,7 @@ angle_template:
       - 80
       - 95
       - 90
-      - 35
+      - 50
     -
       - 100
       - 35
@@ -96,18 +96,18 @@ angle_template:
       - 180
     -
       - 0
-      - 80
-      - 150
+      - 110
+      - 160
       - 155
       - 180
       - 180
     -
       - 0
-      - 80
-      - 150
+      - 110
+      - 160
       - 155
       - 180
-      - 35
+      - 50
 avoid:
  min_dis: 0.1
  max_dis: 6.0
@@ -120,4 +120,4 @@ ready_to_sweep:
   front_plate: -150
   after_plate: 0
 
-arm_assert_num: 6
+arm_assert_num: 10
