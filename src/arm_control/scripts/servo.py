@@ -19,7 +19,7 @@ class ArmCon:
         self.initial_angle=[]
         self.chazhi_angle=[]
         self.arm_assert_num = rospy.get_param("/arm_assert_num")
-        rospy.Subscriber("/servo_angle_control_topic",UInt32,self.servo_angle_control_topic_cb)
+        rospy.Subscriber("/servo_angle_control_topic",UInt32,self.new_servo_angle_control_topic_cb)
         rospy.Subscriber("/manual",manual,self.servo_manual_control_topic_cb)
         self.read_servo_angle_topic = rospy.Publisher("/read_servo_angle_topic",Int32MultiArray,queue_size=1)
         self.ctrl_all_servo([90, 180, 90, 0, 80, 100])
