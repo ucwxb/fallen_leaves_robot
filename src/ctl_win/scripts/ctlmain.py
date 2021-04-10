@@ -176,9 +176,10 @@ class Ui_CtlWin(QMainWindow):
         if self.before_vel != self.vel:
             self.before_vel = self.vel.copy()
             self.send_stm32_vel_func()
-        if self.before_angle != self.servo_angle:
-            self.before_angle = self.servo_angle.copy()
-            self.send_arm_func()
+        if self.arm_num == 0:
+            if self.before_angle != self.servo_angle:
+                self.before_angle = self.servo_angle.copy()
+                self.send_arm_func()
 
 
     def send_stm32_vel_func(self):
