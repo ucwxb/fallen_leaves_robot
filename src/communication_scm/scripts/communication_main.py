@@ -90,6 +90,7 @@ class Com:
             cmd_string += bytes([i])
         for i in vel_yaw:
             cmd_string += bytes([i])
+        print(cmd_string)
         self.send_stm32(cmd_string)
     
     def send_stm32_fan(self,msg):
