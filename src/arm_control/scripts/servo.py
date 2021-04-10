@@ -19,6 +19,7 @@ class ArmCon:
         rospy.Subscriber("/servo_angle_control_topic",UInt32,self.servo_angle_control_topic_cb)
         rospy.Subscriber("/manual",manual,self.servo_manual_control_topic_cb)
         self.read_servo_angle_topic = rospy.Publisher("/read_servo_angle_topic",Int32MultiArray,queue_size=1)
+        self.ctrl_all_servo([90, 180, 90, 0, 80, 100])
     
     def ctrl_all_servo(self,angle, s_time = 500):
         self.Arm.Arm_serial_servo_write6(angle[0], angle[1], angle[2], angle[3], angle[4], angle[5], s_time)
