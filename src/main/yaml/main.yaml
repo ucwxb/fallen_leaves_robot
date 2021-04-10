@@ -11,12 +11,12 @@ vel_I: 0
 vel_D: 0
 w_P: 0
 max_vel: 
-  - 80
-  - 80
+  - 20
+  - 20
   - 1.5
 min_vel:
-  - 30
-  - 30
+  - 10
+  - 10
   - 0.5
 FLR_ip: 192.168.8.101
 FLR_port: 8888
@@ -54,7 +54,7 @@ avoid:
  max_dis: 6.0
  danger_dis: 1.0
  min_num: 10
- ample: 40
+ ample: 10
 min_sweep_time: 10
 ready_to_sweep:
   brush: 0
