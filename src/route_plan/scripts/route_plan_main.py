@@ -8,6 +8,7 @@ from PID import PID
 from communication_scm.msg import *
 import numpy as np
 from sensor_msgs.msg import LaserScan
+import time
 class Point:
     def __init__(self,dis,angle,index):
         self.dis = dis
@@ -29,6 +30,10 @@ class RoutePlanNode:
         self.x_avoid_vel = 0
         self.y_avoid_vel = 0
         self.current_mode = 0
+        self.sweep_status = 0
+        self.min_sweep_time = rospy.get_param("/min_sweep_time")
+        self.start_sweep_time = 0
+
 
         rospy.Subscriber("/leaf_detect",leaf_detect_msg,self.leaf_detect_cb)
         rospy.Subscriber("/switch_mode",Int32,self.switch_mode_cb)
@@ -108,6 +113,14 @@ class RoutePlanNode:
 
     def switch_mode_cb(self,msg):
         self.current_mode = msg.data
+    
+    def ready_to_sweep(self):
+        self.send_stm32_brush.publish(stm_brush_cmd(rospy.get_param("/ready_to_sweep/brush")))
+        self.send_plc_cmd.publish(plc_plate_cmd(rospy.get_param("/ready_to_sweep/front_plate"),rospy.get_param("/ready_to_sweep/after_plate")))
+    
+    def reset_from_sweep(self):
+        self.send_stm32_brush.publish(stm_brush_cmd(0))
+        self.send_plc_cmd.publish(plc_plate_cmd(0,0))
 
     def get_leaf_pos(self,res):
         distance = []
@@ -128,7 +141,7 @@ class RoutePlanNode:
             self.send_stm32_vel.publish(stm_vel_cmd(0,0,0))
             self.send_stm32_fan.publish(stm_fan_cmd(0))
             self.send_stm32_brush.publish(stm_brush_cmd(0))
-            self.send_plc_cmd.publish(plc_cmd(0,0))
+            self.send_plc_cmd.publish(plc_plate_cmd(0,0))
         elif self.current_mode == 2:
             self._stm_vel.x += self.x_avoid_vel
             self._stm_vel.y += self.y_avoid_vel
@@ -144,12 +157,21 @@ class RoutePlanNode:
             self.stm_vel.y = res[1]
             self.stm_vel.yaw = res[2]
             
+            if self.sweep_status == 0:
+                self.sweep_status =1
+                self.start_sweep_time = time.time()
+                self.ready_to_sweep()
 
 
         else:
             self.stm_vel.x = 0
             self.stm_vel.y = 0
             self.stm_vel.yaw = 0
+
+            if self.sweep_status == 1:
+                if self.start_sweep_time -time.time() > self.min_sweep_time:
+                    self.sweep_status =0
+                    self.reset_from_sweep()
         
     def MainLoop(self):
         while not rospy.is_shutdown():

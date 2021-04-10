@@ -55,3 +55,8 @@ avoid:
  danger_dis: 1.0
  min_num: 10
  ample: 40
+min_sweep_time: 10
+ready_to_sweep:
+  brush: 0
+  front_plate: 0
+  after_plate: 0
