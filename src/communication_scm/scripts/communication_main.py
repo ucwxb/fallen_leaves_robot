@@ -101,6 +101,7 @@ class Com:
         cmd_string += bytes([msg_type])
         for i in vel:
             cmd_string += bytes([i])
+        print(cmd_string)
         self.send_stm32(cmd_string)
     
     def send_stm32_brush(self,msg):
