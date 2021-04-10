@@ -42,15 +42,13 @@ class ArmCon:
         Number = msg.data - 1
         self.initial_angle=self.current_angle.copy()
         self.target_angle_list = self.angle_template[Number]
+        self.send_plc_cmd.publish(plc_plate_cmd(100,-20))
         for i in range(len(self.target_angle_list)):
-            self.send_plc_cmd.publish(plc_plate_cmd(100,-20))
-            time.sleep(2)
             if i == 0:
                 self.arm_assert(self.initial_angle,self.target_angle_list[i])
             else:
                 self.arm_assert(self.target_angle_list[i-1],self.target_angle_list[i])
-            time.sleep(2)
-            self.send_plc_cmd.publish(plc_plate_cmd(100,-10))
+        self.send_plc_cmd.publish(plc_plate_cmd(100,-10))
 
     def  arm_chazhi(self,n,m):
         if n==0:
