@@ -34,6 +34,7 @@ class RoutePlanNode:
         self.min_sweep_time = rospy.get_param("/min_sweep_time")
         self.start_sweep_time = 0
 
+        self.is_ban_avoid = 1
 
         rospy.Subscriber("/leaf_detect",leaf_detect_msg,self.leaf_detect_cb)
         rospy.Subscriber("/switch_mode",Int32,self.switch_mode_cb)
@@ -51,7 +52,10 @@ class RoutePlanNode:
         self.min_num = rospy.get_param("/avoid/min_num")
         self.ample = rospy.get_param("/avoid/ample")
         rospy.Subscriber("/scan",LaserScan,self.laser_cloud_cb)
+        rospy.Subscriber("/switch_avoid",Empty,self.switch_avoid)
         
+    def switch_avoid(self):
+        self.is_ban_avoid = 1-self.is_ban_avoid
 
     def laser_cloud_cb(self,msg):
         if self.lock:
@@ -59,6 +63,8 @@ class RoutePlanNode:
         self.lock = True
         self.x_avoid_vel = 0
         self.y_avoid_vel = 0
+        if self.is_ban_avoid:
+            return
         angle_increment = msg.angle_increment
         ranges = msg.ranges
         res_list = []
