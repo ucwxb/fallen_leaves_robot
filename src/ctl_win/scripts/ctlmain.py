@@ -9,13 +9,15 @@ import rospy
 from communication_scm.msg import *
 from arm_control.msg import * 
 from std_msgs.msg import UInt32,Int32,UInt32MultiArray,Int32MultiArray,Empty
-from PyQt5.QtCore import Qt,QTimer
+from PyQt5.QtCore import *
 # from cv_bridge import CvBridge
 # from TCP import tcp
 from UDP import UDP_Manager
 # from sensor_msgs.msg import Image
 import numpy as np
 import cv2
+from ssh_FLR import SSHFLR
+from ssh_Dofbot import SSHYAHBOOM
 class Ui_CtlWin(QMainWindow):
 
     def __init__(self):
@@ -30,6 +32,7 @@ class Ui_CtlWin(QMainWindow):
         
         self.vel = [0,0,0]
         self._vel = [0,0,0]
+        self.before_vel = self.vel.copy()
 
         self.front_plate = 0
         self.behind_plate = 0
@@ -37,6 +40,9 @@ class Ui_CtlWin(QMainWindow):
         self.fan = 0
 
         self.servo_angle = [0,0,0,0,0,0]
+        self.before_angle = self.servo_angle.copy()
+        self.first_time_read_servo = 1
+        self.is_minus_angle = 0
         self._servo_angle = [0,0,0,0,0,0]
 
         self.arm_num = 0
@@ -167,6 +173,13 @@ class Ui_CtlWin(QMainWindow):
 
         self.arm_num_text.setText(str(self.arm_num))
 
+        if self.before_vel != self.vel:
+            self.before_vel = self.vel.copy()
+            self.send_stm32_vel_func()
+        if self.before_angle != self.servo_angle:
+            self.before_angle = self.servo_angle.copy()
+            self.send_arm_func()
+
 
     def send_stm32_vel_func(self):
         info = stm_vel_cmd()
@@ -232,10 +245,10 @@ class Ui_CtlWin(QMainWindow):
         self.vel[1] -= self.add_val
 
     def yaw_but_add_func(self):
-        self.vel[2] += self.add_val
+        self.vel[2] += 0.1
 
     def yaw_but_minus_func(self):
-        self.vel[2] -= self.add_val
+        self.vel[2] -= 0.1
     
     def front_plate_add_func(self):
         self.front_plate += self.add_val
@@ -292,6 +305,9 @@ class Ui_CtlWin(QMainWindow):
         servo_angle = msg.data
         for i in range(6):
             self._servo_angle[i] = servo_angle[i]
+        if self.first_time_read_servo:
+            self.servo_angle = self._servo_angle
+            self.first_time_read_servo = 0
     
     def display_vel(self,msg):
         self._vel[0] = msg.x
@@ -312,6 +328,54 @@ class Ui_CtlWin(QMainWindow):
                 self.label.size(),Qt.KeepAspectRatio,Qt.SmoothTransformation
             ))
             self.lock = False
+    
+    def keyPressEvent(self, event):
+        if (event.key() == Qt.Key_W):
+            self.vel[0] += self.add_val
+        elif (event.key() == Qt.Key_S):
+            self.vel[0] -= self.add_val
+        elif (event.key() == Qt.Key_A):
+            self.vel[1] -= self.add_val
+        elif (event.key() == Qt.Key_D):
+            self.vel[1] += self.add_val
+        elif (event.key() == Qt.Key_Q):
+            self.vel[2] -= 0.1
+        elif (event.key() == Qt.Key_E):
+            self.vel[2] += 0.1
+        elif (event.key() == Qt.Key_1):
+            if self.is_minus_angle:
+                self.servo_angle[0] -= self.add_val
+            else:
+                self.servo_angle[0] += self.add_val
+        elif (event.key() == Qt.Key_2):
+            if self.is_minus_angle:
+                self.servo_angle[1] -= self.add_val
+            else:
+                self.servo_angle[1] += self.add_val
+        elif (event.key() == Qt.Key_3):
+            if self.is_minus_angle:
+                self.servo_angle[2] -= self.add_val
+            else:
+                self.servo_angle[2] += self.add_val
+        elif (event.key() == Qt.Key_4):
+            if self.is_minus_angle:
+                self.servo_angle[3] -= self.add_val
+            else:
+                self.servo_angle[3] += self.add_val
+        elif (event.key() == Qt.Key_5):
+            if self.is_minus_angle:
+                self.servo_angle[4] -= self.add_val
+            else:
+                self.servo_angle[4] += self.add_val
+        elif (event.key() == Qt.Key_6):
+            if self.is_minus_angle:
+                self.servo_angle[5] -= self.add_val
+            else:
+                self.servo_angle[5] += self.add_val
+        elif (event.key() == Qt.Key_Plus):
+            self.is_minus_angle = 0
+        elif (event.key() == Qt.Key_Minus):
+            self.is_minus_angle = 1
 
     def setupUi(self, CtlWin):
         CtlWin.setObjectName("CtlWin")
