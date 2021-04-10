@@ -119,6 +119,8 @@ class RoutePlanNode:
     def handle_mode(self):
         self.is_handle = 1
         if self.current_mode == 1:
+            self.stm_vel.x += self.x_avoid_vel
+            self.stm_vel.y += self.y_avoid_vel
             self.send_stm32_vel.publish(self.stm_vel)
         elif self.current_mode == 0:
             self.stm_vel = stm_vel_cmd()
@@ -128,6 +130,8 @@ class RoutePlanNode:
             self.send_stm32_brush.publish(stm_brush_cmd(0))
             self.send_plc_cmd.publish(plc_cmd(0,0))
         elif self.current_mode == 2:
+            self._stm_vel.x += self.x_avoid_vel
+            self._stm_vel.y += self.y_avoid_vel
             self.send_stm32_vel.publish(self._stm_vel)
         self.is_handle = 0
 
@@ -140,8 +144,7 @@ class RoutePlanNode:
             self.stm_vel.y = res[1]
             self.stm_vel.yaw = res[2]
             
-            self.stm_vel.x += self.x_avoid_vel
-            self.stm_vel.y += self.y_avoid_vel
+
 
         else:
             self.stm_vel.x = 0
