@@ -97,8 +97,8 @@ class RoutePlanNode:
             y_vel /= 2.0
         x_vel = x_vel * self.ample
         y_vel = y_vel * self.ample
-        self.x_avoid_vel = x_vel.copy()
-        self.y_avoid_vel = y_vel.copy()
+        self.x_avoid_vel = x_vel
+        self.y_avoid_vel = y_vel
         self.lock = False
 
     def manual_send_stm32_vel(self,msg):
@@ -140,8 +140,8 @@ class RoutePlanNode:
             self.stm_vel.y = res[1]
             self.stm_vel.yaw = res[2]
             
-            self.stm_vel.x += self.x_vel
-            self.stm_vel.y += self.y_vel
+            self.stm_vel.x += self.x_avoid_vel
+            self.stm_vel.y += self.y_avoid_vel
 
         else:
             self.stm_vel.x = 0
