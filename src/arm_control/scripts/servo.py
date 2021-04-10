@@ -38,7 +38,8 @@ class ArmCon:
             self.ctrl_all_servo(assert_angle)
     
     def new_servo_angle_control_topic_cb(self,msg):
-        Number = msg.data
+        print(len(self.angle_template))
+        Number = msg.data - 1
         self.initial_angle=self.current_angle.copy()
         self.target_angle_list = self.angle_template[Number]
         for i in range(len(self.target_angle_list)):
