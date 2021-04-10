@@ -54,7 +54,7 @@ class RoutePlanNode:
         rospy.Subscriber("/scan",LaserScan,self.laser_cloud_cb)
         rospy.Subscriber("/switch_avoid",Empty,self.switch_avoid)
         
-    def switch_avoid(self):
+    def switch_avoid(self,msg):
         self.is_ban_avoid = 1-self.is_ban_avoid
 
     def laser_cloud_cb(self,msg):
