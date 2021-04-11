@@ -107,8 +107,8 @@ class Ui_CtlWin(QMainWindow):
         self.send_arm.clicked.connect(self.send_arm_func)
 
         self.change_vel.clicked.connect(self.change_func)
-        self.change_vel_text = ["x1","x10","x0.1"]
-        self.change_vel_ = [1,10,0.1]
+        self.change_vel_text = ["x10","x1","x100"]
+        self.change_vel_ = [10,1,100]
         self.change_vel_index = 0
         self.add_val = self.change_vel_[self.change_vel_index]
 

@@ -122,10 +122,12 @@ class RoutePlanNode:
     
     def ready_to_sweep(self):
         self.send_stm32_brush.publish(stm_brush_cmd(rospy.get_param("/ready_to_sweep/brush")))
+        self.send_stm32_fan.publish(stm_fan_cmd(rospy.get_param("/ready_to_sweep/fan")))
         self.send_plc_cmd.publish(plc_plate_cmd(rospy.get_param("/ready_to_sweep/front_plate"),rospy.get_param("/ready_to_sweep/after_plate")))
     
     def reset_from_sweep(self):
         self.send_stm32_brush.publish(stm_brush_cmd(0))
+        self.send_stm32_fan.publish(stm_fan_cmd(0))
         self.send_plc_cmd.publish(plc_plate_cmd(-10,100))
 
     def get_leaf_pos(self,res):
@@ -171,9 +173,9 @@ class RoutePlanNode:
 
 
         else:
-            self.stm_vel.x = 0
-            self.stm_vel.y = 0
-            self.stm_vel.yaw = 0
+            self.stm_vel.x = self._stm_vel.x
+            self.stm_vel.y = self._stm_vel.y
+            self.stm_vel.yaw = self._stm_vel.yaw
 
             if self.sweep_status == 1:
                 if self.start_sweep_time -time.time() > self.min_sweep_time:

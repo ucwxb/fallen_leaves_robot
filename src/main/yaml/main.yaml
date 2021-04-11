@@ -160,6 +160,7 @@ min_sweep_time: 10
 ready_to_sweep:
   brush: 120
   front_plate: -150
-  after_plate: 0
+  after_plate: 100
+  fan: 999
 
 arm_assert_num: 3
