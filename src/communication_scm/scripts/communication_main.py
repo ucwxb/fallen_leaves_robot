@@ -155,10 +155,15 @@ class Com:
 
         cmd_string = b''
         cmd_string += bytes([0xFA])
+        check_sum = 0
         for i in cmd_slisde_dis:
             cmd_string += bytes([i])
+            check_sum += i
         for i in cmd_arm_dis:
             cmd_string += bytes([i])
+            check_sum += i
+        check_sum %= 256
+        cmd_string += bytes([check_sum])
         cmd_string += bytes([0xAA])
 
         self.enable_plc_receive = True
