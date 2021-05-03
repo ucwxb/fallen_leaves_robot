@@ -28,6 +28,9 @@ class Com:
         rospy.Subscriber("/send_plc_cmd",plc_plate_cmd,self.send_plc_cmd)
 
         self.init_serial()
+
+        self.enable_plc_receive = False
+        self.enable_stm_receive = False
     
     def init_serial(self):
         times = 0
@@ -66,11 +69,17 @@ class Com:
             return
 
     def receive_stm32_func(self):
+        if self.enable_plc_receive == False:
+            return 
         if self.ser != None and self.ser.isOpen():
-            res = self.ser.readall()
-            res = bytes.decode(res)
-            if res != '':
-                self.receive_stm32.publish(res)
+            try:
+                res = self.ser.readall()
+                res = bytes.decode(res)
+
+                if res != '':
+                    self.receive_stm32.publish(res)
+            except:
+                return
 
     def send_stm32_vel(self,msg):
         vel_x = msg.x
@@ -122,26 +131,47 @@ class Com:
             return
     
     def receive_plc_func(self):
+        if self.enable_plc_receive == False:
+            return 
         if self.plc_ser != None and self.plc_ser.isOpen():
-            res = self.plc_ser.readall()
-            res = bytes.decode(res)
-            if res != '':
-                self.receive_plc.publish(res)
+            try:
+                res = self.plc_ser.readall()
+                res = bytes.decode(res)
+                if res == [0xff]:
+                    print("receive_plc")
+                if res != '':
+                    self.receive_plc.publish(res)
+            except:
+                return
 
     def send_plc_cmd(self,msg):
         cmd_slisde_dis = msg.slide_dis
         cmd_arm_dis = msg.arm_dis
         cmd_arm_dis = 100
-        cmd_string = "%d %d"%(cmd_slisde_dis,cmd_arm_dis)
-        cmd_string = bytes(cmd_string,encoding="utf8")
+
+        cmd_slisde_dis = struct.pack('f',cmd_slisde_dis)
+        cmd_arm_dis = struct.pack('f',cmd_arm_dis)
+
+
+        cmd_string = b''
+        cmd_string += bytes([0xFF])
+        cmd_string += bytes([cmd_slisde_dis])
+        cmd_string += bytes([cmd_arm_dis])
+        cmd_string += bytes([0xAA])
+
+        self.enable_plc_receive = True
+        # cmd_string = "%d %d"%(cmd_slisde_dis,cmd_arm_dis)
+        # cmd_string = bytes(cmd_string,encoding="utf8")
+
+
         self.send_plc(cmd_string)
 
 
     def MainLoop(self):
         while not rospy.is_shutdown():
             self.rate.sleep()
-            # self.receive_plc_func()
-            # self.receive_stm32_func()
+            self.receive_plc_func()
+            self.receive_stm32_func()
             
 
 if __name__ == '__main__':
