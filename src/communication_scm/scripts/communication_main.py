@@ -132,8 +132,9 @@ class Com:
     def receive_plc_func(self):
         if self.enable_plc_receive == False:
             return 
+        res = self.plc_ser.readall()
         if self.plc_ser != None and self.plc_ser.isOpen():
-            res = self.plc_ser.readall()
+            
             try:
                 res = self.plc_ser.readall()
                 print(res)
