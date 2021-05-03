@@ -132,10 +132,13 @@ class Com:
     def receive_plc_func(self):
         if self.enable_plc_receive == False:
             return 
+        res = self.plc_ser.readall()
+        print(res)
+        return
         if self.plc_ser != None and self.plc_ser.isOpen():
             
             try:
-                res = self.plc_ser.readall()
+                
                 print(res)
                 res = bytes.decode(res)
                 print("decode",res)
