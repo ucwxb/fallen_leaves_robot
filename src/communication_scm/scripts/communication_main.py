@@ -136,11 +136,13 @@ class Com:
             try:
                 res = self.plc_ser.readall()
                 res = bytes.decode(res)
+                print(res)
                 if res == [0xff]:
                     print("receive_plc")
                 if res != '':
                     self.receive_plc.publish(res)
             except:
+                print("failed to read plc")
                 return
 
     def send_plc_cmd(self,msg):
