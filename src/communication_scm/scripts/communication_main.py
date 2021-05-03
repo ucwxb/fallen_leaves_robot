@@ -29,7 +29,7 @@ class Com:
 
         self.init_serial()
 
-        self.enable_plc_receive = False
+        self.enable_plc_receive = True
         self.enable_stm_receive = False
     
     def init_serial(self):
