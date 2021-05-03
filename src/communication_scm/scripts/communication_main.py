@@ -156,8 +156,8 @@ class Com:
         cmd_string += bytes([0xFF])
         for i in cmd_slisde_dis:
             cmd_string += bytes([i])
-        for i in cmd_slisde_dis:
-            cmd_string += bytes([cmd_arm_dis])
+        for i in cmd_arm_dis:
+            cmd_string += bytes([i])
         cmd_string += bytes([0xAA])
 
         self.enable_plc_receive = True
