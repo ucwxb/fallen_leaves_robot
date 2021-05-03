@@ -165,7 +165,7 @@ class Com:
         self.enable_plc_receive = True
         # cmd_string = "%d %d"%(cmd_slisde_dis,cmd_arm_dis)
         # cmd_string = bytes(cmd_string,encoding="utf8")
-
+        print(cmd_string)
 
         self.send_plc(cmd_string)
 
