@@ -110,7 +110,6 @@ class Com:
         cmd_string += bytes([msg_type])
         for i in vel:
             cmd_string += bytes([i])
-        print(cmd_string)
         self.send_stm32(cmd_string)
     
     def send_stm32_brush(self,msg):
@@ -155,8 +154,10 @@ class Com:
 
         cmd_string = b''
         cmd_string += bytes([0xFF])
-        cmd_string += bytes([cmd_slisde_dis])
-        cmd_string += bytes([cmd_arm_dis])
+        for i in cmd_slisde_dis:
+            cmd_string += bytes([i])
+        for i in cmd_slisde_dis:
+            cmd_string += bytes([cmd_arm_dis])
         cmd_string += bytes([0xAA])
 
         self.enable_plc_receive = True
