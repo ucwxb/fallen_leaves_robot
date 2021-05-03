@@ -1,6 +1,6 @@
 pt_path: v5s-last.pt
 serial_path: /dev/comstm
-plc_serial_path: /dev/ttyUSB0
+plc_serial_path: /dev/ttyUSB1
 cam_index: 0
 serial_rate: 115200
 x_target: 0
