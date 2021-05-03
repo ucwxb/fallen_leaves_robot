@@ -133,7 +133,7 @@ class Com:
         if self.enable_plc_receive == False:
             return 
         print("reading")
-        res = self.plc_ser.readall()
+        res = self.plc_ser.read(1)
         print(res)
         return
         if self.plc_ser != None and self.plc_ser.isOpen():
