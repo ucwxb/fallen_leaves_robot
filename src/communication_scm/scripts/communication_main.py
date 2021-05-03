@@ -133,14 +133,10 @@ class Com:
         if self.enable_plc_receive == False:
             return 
         if self.plc_ser != None and self.plc_ser.isOpen():
-            
             try:
-                
                 res = self.plc_ser.read(1)
                 print(res)
-                res = bytes.decode(res)
-                print("decode",res)
-                if res == [0xff]:
+                if res == bytes([0xbb]):
                     print("receive_plc")
                 if res != '':
                     self.receive_plc.publish(res)
