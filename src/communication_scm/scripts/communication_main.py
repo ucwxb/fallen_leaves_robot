@@ -154,7 +154,7 @@ class Com:
 
 
         cmd_string = b''
-        cmd_string += bytes([0xFF])
+        cmd_string += bytes([0xFA])
         for i in cmd_slisde_dis:
             cmd_string += bytes([i])
         for i in cmd_arm_dis:
