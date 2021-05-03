@@ -135,8 +135,9 @@ class Com:
         if self.plc_ser != None and self.plc_ser.isOpen():
             try:
                 res = self.plc_ser.readall()
-                res = bytes.decode(res)
                 print(res)
+                res = bytes.decode(res)
+                
                 if res == [0xff]:
                     print("receive_plc")
                 if res != '':
