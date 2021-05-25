@@ -14,7 +14,7 @@ class Com:
         rospy.init_node('communication_node', anonymous = True)
         self.output_pin = int(rospy.get_param("/output_pin"))
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(self.output_pin, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(self.output_pin, GPIO.OUT, initial=GPIO.HIGH)
         self.pkg_path = rospy.get_param("/pkg_path/communication_scm")
         self.serial_path = rospy.get_param("/serial_path")
         self.plc_serial_path = rospy.get_param("/plc_serial_path")
@@ -200,9 +200,9 @@ class Com:
     def send_zip_cmd(self,msg):
         command = msg.data
         if command == 1:
-            GPIO.output(self.output_pin, GPIO.HIGH)
-        elif command == 0:
             GPIO.output(self.output_pin, GPIO.LOW)
+        elif command == 0:
+            GPIO.output(self.output_pin, GPIO.HIGH)
         return 
         command = struct.pack('=I',cmd_slisde_dis)
         cmd_string = b''
