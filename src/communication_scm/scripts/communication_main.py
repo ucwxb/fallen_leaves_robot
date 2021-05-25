@@ -201,6 +201,8 @@ class Com:
         command = msg.data
         if command == 1:
             GPIO.output(self.output_pin, GPIO.LOW)
+            time.sleep(0.020)
+            GPIO.output(self.output_pin, GPIO.HIGH)
         elif command == 0:
             GPIO.output(self.output_pin, GPIO.HIGH)
         return 
