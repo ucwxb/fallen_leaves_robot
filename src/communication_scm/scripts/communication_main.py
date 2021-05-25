@@ -15,6 +15,7 @@ class Com:
         self.pkg_path = rospy.get_param("/pkg_path/communication_scm")
         self.serial_path = rospy.get_param("/serial_path")
         self.plc_serial_path = rospy.get_param("/plc_serial_path")
+        self.zip_serial_path = rospy.get_param("/zip_serial_path")
         self.serial_rate = int(rospy.get_param("/serial_rate"))
 
         self.rate = rospy.Rate(20)
@@ -26,6 +27,7 @@ class Com:
         rospy.Subscriber("/send_stm32_fan",stm_fan_cmd,self.send_stm32_fan)
         rospy.Subscriber("/send_stm32_brush",stm_brush_cmd,self.send_stm32_brush)
         rospy.Subscriber("/send_plc_cmd",plc_plate_cmd,self.send_plc_cmd)
+        rospy.Subscriber("/send_zip_cmd",Int32,self.send_zip_cmd)
 
         self.init_serial()
 
@@ -34,6 +36,20 @@ class Com:
     
     def init_serial(self):
         times = 0
+        while(1):
+            try:
+                if times >= 2:
+                    print("failed to connect to zip")
+                    self.zip_ser = None
+                    break
+                self.zip_ser = serial.Serial(self.zip_serial_path, self.serial_rate,timeout=1)
+                print("success connect to zip")
+                break
+            except:
+                times += 1
+                print("zip serial time out")
+            time.sleep(1)
+
         while(1):
             try:
                 if times >= 2:
@@ -168,9 +184,25 @@ class Com:
         self.enable_plc_receive = True
         # cmd_string = "%d %d"%(cmd_slisde_dis,cmd_arm_dis)
         # cmd_string = bytes(cmd_string,encoding="utf8")
-        print(cmd_string)
+        # print(cmd_string)
 
         self.send_plc(cmd_string)
+
+    def send_zip(self,string):
+        try:
+            self.zip_ser.write(string)
+        except:
+            return
+    
+    def send_zip_cmd(self,msg):
+        command = msg.data
+        command = struct.pack('=I',cmd_slisde_dis)
+        cmd_string = b''
+        cmd_string += bytes([0xFF])
+        for i in command:
+            cmd_string += bytes([i])
+        self.send_zip(cmd_string)
+
 
 
     def MainLoop(self):

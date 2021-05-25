@@ -1,6 +1,7 @@
 pt_path: v5s-last.pt
 serial_path: /dev/comstm
 plc_serial_path: /dev/complc
+zip_serial_path: /dev/comzip
 cam_index: 0
 serial_rate: 115200
 x_target: 0
