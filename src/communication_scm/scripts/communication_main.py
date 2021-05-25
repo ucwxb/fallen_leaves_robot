@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #coding:utf-8
 import serial
-# import Jetson.GPIO
+import Jetson.GPIO as GPIO
 import time
 import threading
 import rospy
@@ -12,6 +12,9 @@ import struct
 class Com:
     def __init__(self):
         rospy.init_node('communication_node', anonymous = True)
+        self.output_pin = int(rospy.get_param("/output_pin"))
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(self.output_pin, GPIO.OUT, initial=GPIO.LOW)
         self.pkg_path = rospy.get_param("/pkg_path/communication_scm")
         self.serial_path = rospy.get_param("/serial_path")
         self.plc_serial_path = rospy.get_param("/plc_serial_path")
@@ -196,6 +199,11 @@ class Com:
     
     def send_zip_cmd(self,msg):
         command = msg.data
+        if command == 1:
+            GPIO.output(self.output_pin, GPIO.HIGH)
+        elif command == 0:
+            GPIO.output(self.output_pin, GPIO.LOW)
+        return 
         command = struct.pack('=I',cmd_slisde_dis)
         cmd_string = b''
         cmd_string += bytes([0xFF])
