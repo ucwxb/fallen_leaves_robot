@@ -6,3 +6,5 @@ venv
 .idea
 .code
 __pycache__/
+*.o
+LRC/MDK-ARM/LRC/
